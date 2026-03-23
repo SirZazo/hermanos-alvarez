@@ -6,3 +6,4 @@ __pycache__/
 
 # Otros
 *.txt
+!hermanosalvarez_back/requirements.txt
