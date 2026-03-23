@@ -1,5 +1,8 @@
-# Python venv
-env_back/
+# Python
 venv/
+hermanosalvarez_back/venv/
 __pycache__/
 *.pyc
+
+# Otros
+*.txt
