@@ -3,8 +3,9 @@ import '../../../../shared/widgets/app_shell.dart';
 import '../widgets/hero_section.dart';
 import '../widgets/commitment_section.dart';
 import '../widgets/about_section.dart';
-import '../widgets/location_section.dart';
+//import '../widgets/location_section.dart';
 import '../widgets/footer.dart';
+import '../widgets/value_section.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -22,8 +23,9 @@ class HomePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   HeroSection(),
+                  ValueSection(),
                   AboutSection(),
-                  LocationSection(),
+                  //LocationSection(),
                   FooterSection(),
                   
                   

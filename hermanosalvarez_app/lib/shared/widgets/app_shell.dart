@@ -12,6 +12,7 @@ class AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: const AppNavbarDrawer(),
       body: Column(
         children: [
           const AppNavbar(),
