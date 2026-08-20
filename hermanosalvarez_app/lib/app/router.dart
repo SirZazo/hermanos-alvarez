@@ -4,7 +4,9 @@ import '../features/horarios/pages/horarios_page.dart';
 
 class AppRouter {
   static const String home = '/';
+  static const String queOfrecemos = '/que-ofrecemos';
   static const String horarios = '/horarios';
+  static const String contacto = '/contacto';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -14,9 +16,21 @@ class AppRouter {
           settings: settings,
         );
 
+      case queOfrecemos:
+        return MaterialPageRoute(
+          builder: (_) => const HomePage(),
+          settings: settings,
+        );
+
       case horarios:
         return MaterialPageRoute(
           builder: (_) => const HorariosPage(),
+          settings: settings,
+        );
+
+      case contacto:
+        return MaterialPageRoute(
+          builder: (_) => const HomePage(),
           settings: settings,
         );
 

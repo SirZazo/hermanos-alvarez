@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_decorations.dart';
 import '../../../shared/widgets/app_shell.dart';
 import '../data/api_service.dart';
+
 
 class HorariosPage extends StatefulWidget {
   const HorariosPage({super.key});
@@ -13,6 +17,7 @@ class _HorariosPageState extends State<HorariosPage> {
   final ApiService _apiService = ApiService();
 
   bool loading = true;
+  bool cargandoDestinos = false;
   String? error;
 
   String? origenSeleccionado;
@@ -48,26 +53,38 @@ class _HorariosPageState extends State<HorariosPage> {
   }
 
 Future<void> _cargarDestinosValidos(String origen) async {
+  setState(() {
+    cargandoDestinos = true;
+    destinosDisponibles = [];
+    destinoSeleccionado = null;
+    busquedaRealizada = false;
+    resultadosHorarios = [];
+    error = null;
+  });
+
   try {
     final destinos = await _apiService.getDestinosValidos(
       origen: origen,
       dia: diaSeleccionado,
     );
 
+    if (!mounted) return;
+
     setState(() {
       destinosDisponibles = destinos;
-      destinoSeleccionado = null;
-      busquedaRealizada = false;
-      resultadosHorarios = [];
+      cargandoDestinos = false;
       error = null;
     });
   } catch (e) {
+    if (!mounted) return;
+
     setState(() {
       error = e.toString();
       destinosDisponibles = [];
       destinoSeleccionado = null;
       busquedaRealizada = false;
       resultadosHorarios = [];
+      cargandoDestinos = false;
     });
   }
 }
@@ -127,184 +144,754 @@ Future<void> _cargarDestinosValidos(String origen) async {
     });
   }
 
+InputDecoration _inputDecoration({
+  required String label,
+  required IconData icon,
+  required bool selected,
+}) {
+  final borderColor =
+      selected ? AppColors.accentHover : AppColors.border;
+
+  return InputDecoration(
+    labelText: label,
+
+    labelStyle: TextStyle(
+      color: selected
+          ? AppColors.primary
+          : AppColors.textSecondary,
+      fontWeight: selected
+          ? FontWeight.w600
+          : FontWeight.w500,
+    ),
+
+    prefixIcon: Icon(
+      icon,
+      color: selected
+          ? AppColors.primary
+          : AppColors.textMuted,
+      size: 21,
+    ),
+
+    filled: true,
+
+    fillColor: selected
+        ? const Color.fromRGBO(216, 233, 106, 0.08)
+        : AppColors.surfaceSoft,
+
+    contentPadding: const EdgeInsets.symmetric(
+      horizontal: 18,
+      vertical: 18,
+    ),
+
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide(
+        color: borderColor,
+      ),
+    ),
+
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide(
+        color: borderColor,
+        width: selected ? 1.4 : 1,
+      ),
+    ),
+
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(
+        color: AppColors.primary,
+        width: 1.7,
+      ),
+    ),
+
+    disabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(
+        color: AppColors.border,
+      ),
+    ),
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return AppShell(
-      child: SingleChildScrollView(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1100),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Consulta de horarios',
-                    style: TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF002F6C),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Selecciona origen, destino y día para ver las salidas disponibles de forma rápida y clara.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  if (loading)
-                    const Center(child: CircularProgressIndicator())
-                  else if (error != null && stops.isEmpty)
-                    Text('Error cargando datos: $error')
-                  else
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        DropdownButtonFormField<String>(
-                          hint: const Text('Origen'),
-                          value: origenSeleccionado,
-                          items: stops.map((stop) {
-                            return DropdownMenuItem<String>(
-                              value: stop['id'] as String,
-                              child: Text(stop['nombre'] as String),
-                            );
-                          }).toList(),
-                          onChanged: (value) async {
-                            if (value == null) return;
+      child: Container(
+        width: double.infinity,
+        color: AppColors.pageBackground,
+        child: SingleChildScrollView(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1100),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 38, 24, 56),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(),
+                    const SizedBox(height: 28),
 
-                            setState(() {
-                              origenSeleccionado = value;
-                              destinosDisponibles = [];
-                              destinoSeleccionado = null;
-                              resultadosHorarios = [];
-                              busquedaRealizada = false;
-                              error = null;
-                            });
-                            if (origenSeleccionado != null) {
-                              await _cargarDestinosValidos(origenSeleccionado!);
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        Center(
-                          child: IconButton(
-                            onPressed: (origenSeleccionado != null &&
-                                    destinoSeleccionado != null)
-                                ? intercambiarOrigenDestino
-                                : null,
-                            icon: const Icon(Icons.swap_vert_circle),
-                            iconSize: 34,
-                            tooltip: 'Intercambiar origen y destino',
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<String>(
-                          hint: const Text('Destino'),
-                          value: destinosDisponibles.any(
-                                  (stop) => stop['id'] == destinoSeleccionado)
-                              ? destinoSeleccionado
-                              : null,
-                          items: destinosDisponibles.map((stop) {
-                            return DropdownMenuItem<String>(
-                              value: stop['id'] as String,
-                              child: Text(stop['nombre'] as String),
-                            );
-                          }).toList(),
-                          onChanged: origenSeleccionado == null
-                              ? null
-                              : (value) {
-                                  setState(() {
-                                    destinoSeleccionado = value;
-                                    resultadosHorarios = [];
-                                    busquedaRealizada = false;
-                                    error = null;
-                                  });
-                                },
-                        ),
-                        const SizedBox(height: 16),
-                        DropdownButtonFormField<String>(
-                          value: diaSeleccionado,
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'laborable',
-                              child: Text('Laborable'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'sabado',
-                              child: Text('Sábado'),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() {
-                                diaSeleccionado = value;
-                                resultadosHorarios = [];
-                                busquedaRealizada = false;
-                                error = null;
-                              });
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: (origenSeleccionado != null &&
-                                    destinoSeleccionado != null)
-                                ? _buscarHorarios
-                                : null,
-                            child: const Text('Buscar horarios'),
-                          ),
-                        ),
-                        if (error != null && stops.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 16),
-                            child: Text('Error: $error'),
-                          ),
-                        if (busquedaRealizada)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20),
-                            child: resultadosHorarios.isEmpty
-                                ? const Text('No hay horarios disponibles')
-                                : Column(
-                                    children: resultadosHorarios.map((viaje) {
-                                      return Container(
-                                        width: double.infinity,
-                                        margin:
-                                            const EdgeInsets.only(bottom: 10),
-                                        padding: const EdgeInsets.all(14),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          border: Border.all(
-                                            color: const Color(0xFFE0E0E0),
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: Text(
-                                          '${viaje['salida']} → ${viaje['llegada']}',
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                          ),
+                    if (loading)
+                      _buildLoadingCard()
+                    else if (error != null && stops.isEmpty)
+                      _buildInitialError()
+                    else ...[
+                      _buildSearchCard(),
+
+                      if (error != null && stops.isNotEmpty) ...[
+                        const SizedBox(height: 18),
+                        _buildErrorCard(),
                       ],
-                    ),
-                ],
+
+                      if (busquedaRealizada) ...[
+                        const SizedBox(height: 24),
+                        _buildResultsCard(),
+                      ],
+                    ],
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 28,
+        vertical: 26,
+      ),
+      decoration: AppDecorations.softPanel(),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _HeaderIcon(),
+          SizedBox(width: 18),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Consulta de horarios',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primaryDeep,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Selecciona origen, destino y día para consultar las salidas disponibles.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.5,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(28),
+      decoration: AppDecorations.card(
+      radius: 18,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Planifica tu viaje',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Indica desde dónde sales y hasta dónde quieres viajar.',
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          DropdownButtonFormField<String>(
+            isExpanded: true,
+            decoration: _inputDecoration(
+            label: 'Origen',
+            icon: Icons.trip_origin_rounded,
+            selected: origenSeleccionado != null,
+          ),
+            value: origenSeleccionado,
+            items: stops.map((stop) {
+              return DropdownMenuItem<String>(
+                value: stop['id'] as String,
+                child: Text(
+                  stop['nombre'] as String,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              );
+            }).toList(),
+            onChanged: (value) async {
+              if (value == null) return;
+
+              setState(() {
+                origenSeleccionado = value;
+                destinosDisponibles = [];
+                destinoSeleccionado = null;
+                resultadosHorarios = [];
+                busquedaRealizada = false;
+                error = null;
+              });
+
+              await _cargarDestinosValidos(value);
+            },
+          ),
+
+          const SizedBox(height: 12),
+
+          Center(
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.border,
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color.fromRGBO(9, 37, 79, 0.05),
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: IconButton(
+              onPressed: (!cargandoDestinos &&
+                      origenSeleccionado != null &&
+                      destinoSeleccionado != null)
+                  ? intercambiarOrigenDestino
+                  : null,
+                icon: const Icon(
+                  Icons.swap_vert_rounded,
+                ),
+                color: AppColors.primary,
+                disabledColor: AppColors.textMuted,
+                hoverColor: AppColors.accentSoft,
+                highlightColor: AppColors.accentSoft,
+                splashColor: AppColors.accent,
+                iconSize: 27,
+                tooltip: 'Intercambiar origen y destino',
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          DropdownButtonFormField<String>(
+            isExpanded: true,
+            decoration: _inputDecoration(
+              label: 'Destino',
+              icon: Icons.location_on_outlined,
+              selected: destinoSeleccionado != null,
+            ),
+            value: destinosDisponibles.any(
+              (stop) => stop['id'] == destinoSeleccionado,
+            )
+                ? destinoSeleccionado
+                : null,
+            items: destinosDisponibles.map((stop) {
+              return DropdownMenuItem<String>(
+                value: stop['id'] as String,
+                child: Text(
+                  stop['nombre'] as String,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              );
+            }).toList(),
+            onChanged: (origenSeleccionado == null || cargandoDestinos)
+                ? null
+                : (value) {
+                    setState(() {
+                      destinoSeleccionado = value;
+                      resultadosHorarios = [];
+                      busquedaRealizada = false;
+                      error = null;
+                    });
+                  },
+            hint: cargandoDestinos
+            ? const Row(
+                children: [
+                  SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Text(
+                    'Cargando destinos...',
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              )
+            : const Text('Selecciona un destino'),
+          ),
+
+          const SizedBox(height: 28),
+
+          DropdownButtonFormField<String>(
+            isExpanded: true,
+            decoration: _inputDecoration(
+            label: 'Día del servicio',
+            icon: Icons.calendar_today_outlined,
+            selected: true,
+          ),
+            value: diaSeleccionado,
+            items: const [
+              DropdownMenuItem(
+                value: 'laborable',
+                child: Text('Laborable'),
+              ),
+              DropdownMenuItem(
+                value: 'sabado',
+                child: Text('Sábado'),
+              ),
+            ],
+            onChanged: (value) {
+              if (value == null) return;
+
+              setState(() {
+                diaSeleccionado = value;
+                resultadosHorarios = [];
+                busquedaRealizada = false;
+                error = null;
+              });
+
+              if (origenSeleccionado != null) {
+                _cargarDestinosValidos(origenSeleccionado!);
+              }
+            },
+          ),
+
+          const SizedBox(height: 24),
+
+          SizedBox(
+            width: double.infinity,
+            height: 54,
+            child: ElevatedButton.icon(
+            onPressed: (!cargandoDestinos &&
+                    origenSeleccionado != null &&
+                    destinoSeleccionado != null)
+                ? _buscarHorarios
+                : null,
+              icon: const Icon(
+                Icons.search_rounded,
+                size: 22,
+              ),
+              label: const Text(
+                'Buscar horarios',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+                  (states) {
+                    if (states.contains(WidgetState.disabled)) {
+                      return AppColors.border;
+                    }
+
+                    if (states.contains(WidgetState.hovered)) {
+                      return AppColors.primaryDark;
+                    }
+
+                    if (states.contains(WidgetState.pressed)) {
+                      return AppColors.primaryDeep;
+                    }
+
+                    return AppColors.primary;
+                  },
+                ),
+                foregroundColor: WidgetStateProperty.resolveWith<Color?>(
+                  (states) {
+                    if (states.contains(WidgetState.disabled)) {
+                      return AppColors.textMuted;
+                    }
+
+                    return AppColors.white;
+                  },
+                ),
+                overlayColor: WidgetStateProperty.all(
+                  const Color.fromRGBO(216, 233, 106, 0.10),
+                ),
+                elevation: WidgetStateProperty.resolveWith<double>(
+                  (states) {
+                    if (states.contains(WidgetState.hovered)) {
+                      return 3;
+                    }
+
+                    return 0;
+                  },
+                ),
+                shape: WidgetStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResultsCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(28),
+      decoration: AppDecorations.card(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.directions_bus_outlined,
+                color: AppColors.primary,
+                size: 24,
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Text(
+                  'Horarios disponibles',
+                  style: TextStyle(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              if (resultadosHorarios.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 11,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.backgroundSoft,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${resultadosHorarios.length} '
+                    '${resultadosHorarios.length == 1 ? 'servicio' : 'servicios'}',
+                    style: const TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          if (resultadosHorarios.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 26,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceSoft,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: AppColors.border,
+                ),
+              ),
+              child: const Column(
+                children: [
+                  Icon(
+                    Icons.event_busy_outlined,
+                    size: 34,
+                    color: AppColors.textMuted,
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'No hay horarios disponibles',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            ...resultadosHorarios.map(
+              (viaje) => _ScheduleItem(
+                salida: '${viaje['salida']}',
+                llegada: '${viaje['llegada']}',
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadingCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 70),
+      decoration: AppDecorations.card(),
+      child: const Column(
+        children: [
+          CircularProgressIndicator(
+            color: AppColors.primary,
+          ),
+          SizedBox(height: 18),
+          Text(
+            'Cargando paradas...',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInitialError() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: AppDecorations.card(
+        radius: 18,
+      ),
+      child: Text(
+        'No se han podido cargar las paradas.\n$error',
+        style: const TextStyle(
+          color: AppColors.textSecondary,
+          height: 1.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF7ED),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: const Color(0xFFFED7AA),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.info_outline_rounded,
+            color: Color(0xFF9A3412),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'No se ha podido completar la consulta: $error',
+              style: const TextStyle(
+                color: Color(0xFF7C2D12),
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeaderIcon extends StatelessWidget {
+  const _HeaderIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 52,
+      height: 52,
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: const Icon(
+        Icons.schedule_rounded,
+        color: AppColors.white,
+        size: 27,
+      ),
+    );
+  }
+}
+
+class _ScheduleItem extends StatefulWidget {
+  final String salida;
+  final String llegada;
+
+  const _ScheduleItem({
+    required this.salida,
+    required this.llegada,
+  });
+
+  @override
+  State<_ScheduleItem> createState() => _ScheduleItemState();
+}
+
+class _ScheduleItemState extends State<_ScheduleItem> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() {
+          _isHovered = true;
+        });
+      },
+      onExit: (_) {
+        setState(() {
+          _isHovered = false;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        transform: Matrix4.translationValues(
+          0,
+          _isHovered ? -2 : 0,
+          0,
+        ),
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 18,
+        ),
+        decoration: BoxDecoration(
+          color: _isHovered
+              ? AppColors.white
+              : AppColors.surfaceSoft,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: _isHovered
+                ? AppColors.borderStrong
+                : AppColors.border,
+          ),
+          boxShadow: _isHovered
+              ? const [
+                  BoxShadow(
+                    color: AppColors.shadowSoft,
+                    blurRadius: 14,
+                    offset: Offset(0, 5),
+                  ),
+                ]
+              : const [],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _TimeBlock(
+                label: 'Salida',
+                time: widget.salida,
+                alignment: CrossAxisAlignment.start,
+              ),
+            ),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.all(9),
+              decoration: BoxDecoration(
+                color: _isHovered
+                    ? AppColors.accent
+                    : AppColors.accentSoft,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.arrow_forward_rounded,
+                color: AppColors.primaryDeep,
+                size: 19,
+              ),
+            ),
+            Expanded(
+              child: _TimeBlock(
+                label: 'Llegada',
+                time: widget.llegada,
+                alignment: CrossAxisAlignment.end,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TimeBlock extends StatelessWidget {
+  final String label;
+  final String time;
+  final CrossAxisAlignment alignment;
+
+  const _TimeBlock({
+    required this.label,
+    required this.time,
+    required this.alignment,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: alignment,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            color: AppColors.textMuted,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          time,
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            color: AppColors.primaryDeep,
+          ),
+        ),
+      ],
     );
   }
 }
