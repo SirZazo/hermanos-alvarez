@@ -35,22 +35,29 @@ class _HorariosPageState extends State<HorariosPage> {
     _loadParadas();
   }
 
-  Future<void> _loadParadas() async {
-    try {
-      final loadedStops = await _apiService.getParadas();
+Future<void> _loadParadas() async {
+  try {
+    final loadedStops = await _apiService.getParadas(
+      dia: diaSeleccionado,
+    );
 
-      setState(() {
-        stops = loadedStops;
-        loading = false;
-        error = null;
-      });
-    } catch (e) {
-      setState(() {
-        error = e.toString();
-        loading = false;
-      });
-    }
+    if (!mounted) return;
+
+    setState(() {
+      stops = loadedStops;
+      loading = false;
+      error = null;
+    });
+  } catch (e) {
+    if (!mounted) return;
+
+    setState(() {
+      stops = [];
+      error = e.toString();
+      loading = false;
+    });
   }
+}
 
 Future<void> _cargarDestinosValidos(String origen) async {
   setState(() {
@@ -114,11 +121,17 @@ Future<void> _cargarDestinosValidos(String origen) async {
     }
   }
 
-  void intercambiarOrigenDestino() {
-    if (origenSeleccionado == null || destinoSeleccionado == null) return;
+    void intercambiarOrigenDestino() {
+      if (origenSeleccionado == null || destinoSeleccionado == null) return;
 
-    final nuevoOrigen = destinoSeleccionado!;
-    final nuevoDestino = origenSeleccionado!;
+      final destinoPuedeSerOrigen = stops.any(
+        (stop) => stop['id'] == destinoSeleccionado,
+      );
+
+      if (!destinoPuedeSerOrigen) return;
+
+      final nuevoOrigen = destinoSeleccionado!;
+      final nuevoDestino = origenSeleccionado!;
 
     setState(() {
       origenSeleccionado = nuevoOrigen;
@@ -288,7 +301,7 @@ InputDecoration _inputDecoration({
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Selecciona origen, destino y día para consultar las salidas disponibles.',
+                  'Selecciona día, origen y destino para consultar las salidas disponibles.',
                   style: TextStyle(
                     fontSize: 16,
                     height: 1.5,
@@ -329,6 +342,51 @@ InputDecoration _inputDecoration({
               color: AppColors.textSecondary,
             ),
           ),
+          const SizedBox(height: 24),
+
+          DropdownButtonFormField<String>(
+            isExpanded: true,
+            decoration: _inputDecoration(
+              label: 'Día del servicio',
+              icon: Icons.calendar_today_outlined,
+              selected: true,
+            ),
+            value: diaSeleccionado,
+            items: const [
+              DropdownMenuItem(
+                value: 'laborable',
+                child: Text('Laborable'),
+              ),
+              DropdownMenuItem(
+                value: 'sabado',
+                child: Text('Sábado'),
+              ),
+              DropdownMenuItem(
+                value: 'domingo_festivos',
+                child: Text('Domingos y festivos'),
+              ),
+            ],
+            onChanged: (value) async {
+              if (value == null || value == diaSeleccionado) return;
+
+              setState(() {
+                diaSeleccionado = value;
+
+                origenSeleccionado = null;
+                destinoSeleccionado = null;
+
+                stops = [];
+                destinosDisponibles = [];
+                resultadosHorarios = [];
+
+                busquedaRealizada = false;
+                error = null;
+              });
+
+              await _loadParadas();
+            },
+          ),
+
           const SizedBox(height: 24),
 
           DropdownButtonFormField<String>(
@@ -385,7 +443,10 @@ InputDecoration _inputDecoration({
               child: IconButton(
               onPressed: (!cargandoDestinos &&
                       origenSeleccionado != null &&
-                      destinoSeleccionado != null)
+                      destinoSeleccionado != null &&
+                      stops.any(
+                        (stop) => stop['id'] == destinoSeleccionado,
+                      ))
                   ? intercambiarOrigenDestino
                   : null,
                 icon: const Icon(
@@ -458,48 +519,8 @@ InputDecoration _inputDecoration({
             : const Text('Selecciona un destino'),
           ),
 
-          const SizedBox(height: 28),
-
-          DropdownButtonFormField<String>(
-            isExpanded: true,
-            decoration: _inputDecoration(
-            label: 'Día del servicio',
-            icon: Icons.calendar_today_outlined,
-            selected: true,
-          ),
-            value: diaSeleccionado,
-            items: const [
-              DropdownMenuItem(
-                value: 'laborable',
-                child: Text('Laborable'),
-              ),
-              DropdownMenuItem(
-                value: 'sabado',
-                child: Text('Sábado'),
-              ),
-              DropdownMenuItem(
-                value: 'domingo_festivos',
-                child: Text('Domingos y festivos'),
-              ),
-            
-            ],
-            onChanged: (value) {
-              if (value == null) return;
-
-              setState(() {
-                diaSeleccionado = value;
-                resultadosHorarios = [];
-                busquedaRealizada = false;
-                error = null;
-              });
-
-              if (origenSeleccionado != null) {
-                _cargarDestinosValidos(origenSeleccionado!);
-              }
-            },
-          ),
-
           const SizedBox(height: 24),
+
 
           SizedBox(
             width: double.infinity,

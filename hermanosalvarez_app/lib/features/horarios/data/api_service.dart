@@ -4,17 +4,28 @@ import 'package:hermanosalvarez_app/core/config/api_config.dart';
 
 class ApiService {
 
-  Future<List<Map<String, dynamic>>> getParadas() async {
-    final response = await http.get(
-      Uri.parse('${ApiConfig.baseUrl}/paradas'),
+  Future<List<Map<String, dynamic>>> getParadas({
+    required String dia,
+  }) async {
+    final uri = Uri.parse(
+      '${ApiConfig.baseUrl}/paradas',
+    ).replace(
+      queryParameters: {
+        'dia': dia,
+      },
     );
+
+    final response = await http.get(uri);
 
     if (response.statusCode != 200) {
       throw Exception('Error al cargar paradas');
     }
 
     final List<dynamic> data = jsonDecode(response.body);
-    return data.map((item) => Map<String, dynamic>.from(item)).toList();
+
+    return data
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
   }
 
   Future<List<Map<String, dynamic>>> getDestinosValidos({
