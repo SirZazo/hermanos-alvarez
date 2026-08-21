@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+
 import '../features/home/presentation/pages/home_page.dart';
 import '../features/horarios/pages/horarios_page.dart';
+import '../features/legal/data/legal_texts.dart';
+import '../features/legal/pages/legal_page.dart';
 
 class AppRouter {
   static const String home = '/';
   static const String queOfrecemos = '/que-ofrecemos';
   static const String horarios = '/horarios';
   static const String contacto = '/contacto';
+
+  static const String avisoLegal = '/aviso-legal';
+  static const String privacidad = '/privacidad';
+  static const String cookies = '/cookies';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -31,6 +38,33 @@ class AppRouter {
       case contacto:
         return MaterialPageRoute(
           builder: (_) => const HomePage(),
+          settings: settings,
+        );
+
+      case avisoLegal:
+        return MaterialPageRoute(
+          builder: (_) => const LegalPage(
+            title: 'Aviso Legal',
+            markdown: LegalTexts.avisoLegal,
+          ),
+          settings: settings,
+        );
+
+      case privacidad:
+        return MaterialPageRoute(
+          builder: (_) => const LegalPage(
+            title: 'Política de Privacidad',
+            markdown: LegalTexts.privacidad,
+          ),
+          settings: settings,
+        );
+
+      case cookies:
+        return MaterialPageRoute(
+          builder: (_) => const LegalPage(
+            title: 'Política de Cookies',
+            markdown: LegalTexts.cookies,
+          ),
           settings: settings,
         );
 
