@@ -477,6 +477,11 @@ InputDecoration _inputDecoration({
                 value: 'sabado',
                 child: Text('Sábado'),
               ),
+              DropdownMenuItem(
+                value: 'domingo_festivos',
+                child: Text('Domingos y festivos'),
+              ),
+            
             ],
             onChanged: (value) {
               if (value == null) return;

@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
 from sqlalchemy import and_
 
 from app.db import get_db
@@ -23,8 +23,63 @@ def root():
 
 
 @app.get("/paradas")
-def get_paradas(db: Session = Depends(get_db)):
-    stops = db.query(Stop).all()
+def get_paradas(
+    dia: str | None = None,
+    db: Session = Depends(get_db),
+):
+    # Si no se especifica día, mantenemos el comportamiento anterior
+    if dia is None:
+        stops = db.query(Stop).all()
+
+    else:
+        OrigenRouteStop = aliased(RouteStop)
+        DestinoRouteStop = aliased(RouteStop)
+
+        HoraOrigen = aliased(TripStopTime)
+        HoraDestino = aliased(TripStopTime)
+
+        # Solo paradas desde las que realmente se puede iniciar
+        # algún viaje ese día.
+        stops = (
+            db.query(Stop)
+            .join(
+                OrigenRouteStop,
+                OrigenRouteStop.stop_id == Stop.id,
+            )
+            .join(
+                DestinoRouteStop,
+                and_(
+                    DestinoRouteStop.route_id == OrigenRouteStop.route_id,
+                    DestinoRouteStop.stop_order > OrigenRouteStop.stop_order,
+                ),
+            )
+            .join(
+                TripSchedule,
+                and_(
+                    TripSchedule.route_id == OrigenRouteStop.route_id,
+                    TripSchedule.day_type == dia,
+                ),
+            )
+            .join(
+                HoraOrigen,
+                and_(
+                    HoraOrigen.trip_id == TripSchedule.id,
+                    HoraOrigen.stop_id == OrigenRouteStop.stop_id,
+                ),
+            )
+            .join(
+                HoraDestino,
+                and_(
+                    HoraDestino.trip_id == TripSchedule.id,
+                    HoraDestino.stop_id == DestinoRouteStop.stop_id,
+                ),
+            )
+            .filter(
+                HoraDestino.time_value > HoraOrigen.time_value,
+            )
+            .distinct()
+            .all()
+        )
 
     resultado = [
         {
@@ -36,71 +91,60 @@ def get_paradas(db: Session = Depends(get_db)):
     ]
 
     resultado.sort(key=lambda x: x["nombre"])
+
     return resultado
 
-
 @app.get("/destinos-validos")
-def get_destinos_validos(origen: str, dia: str = "laborable", db: Session = Depends(get_db)):
-    # Rutas donde aparece el origen
-    route_stops_origen = (
-        db.query(RouteStop)
-        .filter(RouteStop.stop_id == origen)
-        .all()
-    )
+def get_destinos_validos(
+    origen: str,
+    dia: str = "laborable",
+    db: Session = Depends(get_db),
+):
+    OrigenRouteStop = aliased(RouteStop)
+    DestinoRouteStop = aliased(RouteStop)
 
-    destinos_validos = set()
-
-    for origen_rs in route_stops_origen:
-        # Paradas posteriores en la misma ruta
-        siguientes_paradas = (
-            db.query(RouteStop)
-            .filter(
-                RouteStop.route_id == origen_rs.route_id,
-                RouteStop.stop_order > origen_rs.stop_order
-            )
-            .all()
-        )
-
-        if not siguientes_paradas:
-            continue
-
-        # Viajes de esa ruta y ese día
-        trips = (
-            db.query(TripSchedule)
-            .filter(
-                TripSchedule.route_id == origen_rs.route_id,
-                TripSchedule.day_type == dia
-            )
-            .all()
-        )
-
-        for destino_rs in siguientes_paradas:
-            for trip in trips:
-                hora_origen = (
-                    db.query(TripStopTime)
-                    .filter(
-                        TripStopTime.trip_id == trip.id,
-                        TripStopTime.stop_id == origen
-                    )
-                    .first()
-                )
-
-                hora_destino = (
-                    db.query(TripStopTime)
-                    .filter(
-                        TripStopTime.trip_id == trip.id,
-                        TripStopTime.stop_id == destino_rs.stop_id
-                    )
-                    .first()
-                )
-
-                if hora_origen and hora_destino and hora_destino.time_value > hora_origen.time_value:
-                    destinos_validos.add(destino_rs.stop_id)
-                    break
+    HoraOrigen = aliased(TripStopTime)
+    HoraDestino = aliased(TripStopTime)
 
     paradas = (
         db.query(Stop)
-        .filter(Stop.id.in_(destinos_validos))
+        .join(
+            DestinoRouteStop,
+            DestinoRouteStop.stop_id == Stop.id,
+        )
+        .join(
+            OrigenRouteStop,
+            and_(
+                OrigenRouteStop.route_id == DestinoRouteStop.route_id,
+                OrigenRouteStop.stop_id == origen,
+                OrigenRouteStop.stop_order < DestinoRouteStop.stop_order,
+            ),
+        )
+        .join(
+            TripSchedule,
+            and_(
+                TripSchedule.route_id == OrigenRouteStop.route_id,
+                TripSchedule.day_type == dia,
+            ),
+        )
+        .join(
+            HoraOrigen,
+            and_(
+                HoraOrigen.trip_id == TripSchedule.id,
+                HoraOrigen.stop_id == origen,
+            ),
+        )
+        .join(
+            HoraDestino,
+            and_(
+                HoraDestino.trip_id == TripSchedule.id,
+                HoraDestino.stop_id == DestinoRouteStop.stop_id,
+            ),
+        )
+        .filter(
+            HoraDestino.time_value > HoraOrigen.time_value,
+        )
+        .distinct()
         .all()
     )
 
@@ -114,76 +158,87 @@ def get_destinos_validos(origen: str, dia: str = "laborable", db: Session = Depe
     ]
 
     resultado.sort(key=lambda x: x["nombre"])
+
     return resultado
 
-
 @app.get("/horarios")
-def get_horarios(origen: str, destino: str, dia: str, db: Session = Depends(get_db)):
-    # Buscar rutas donde origen y destino estén en orden correcto
-    origen_rows = (
-        db.query(RouteStop)
-        .filter(RouteStop.stop_id == origen)
-        .all()
-    )
+def get_horarios(
+    origen: str,
+    destino: str,
+    dia: str,
+    db: Session = Depends(get_db),
+):
+    OrigenRouteStop = aliased(RouteStop)
+    DestinoRouteStop = aliased(RouteStop)
 
-    ruta_encontrada = None
+    HoraOrigen = aliased(TripStopTime)
+    HoraDestino = aliased(TripStopTime)
 
-    for origen_rs in origen_rows:
-        destino_rs = (
-            db.query(RouteStop)
-            .filter(
-                RouteStop.route_id == origen_rs.route_id,
-                RouteStop.stop_id == destino
-            )
-            .first()
+    viajes = (
+        db.query(
+            TripSchedule.route_id,
+            HoraOrigen.time_value.label("salida"),
+            HoraDestino.time_value.label("llegada"),
         )
-
-        if destino_rs and origen_rs.stop_order < destino_rs.stop_order:
-            ruta_encontrada = origen_rs.route_id
-            break
-
-    if ruta_encontrada is None:
-        return {"ruta": None, "horarios": []}
-
-    trips = (
-        db.query(TripSchedule)
+        .join(
+            OrigenRouteStop,
+            and_(
+                OrigenRouteStop.route_id == TripSchedule.route_id,
+                OrigenRouteStop.stop_id == origen,
+            ),
+        )
+        .join(
+            DestinoRouteStop,
+            and_(
+                DestinoRouteStop.route_id == TripSchedule.route_id,
+                DestinoRouteStop.stop_id == destino,
+                DestinoRouteStop.stop_order > OrigenRouteStop.stop_order,
+            ),
+        )
+        .join(
+            HoraOrigen,
+            and_(
+                HoraOrigen.trip_id == TripSchedule.id,
+                HoraOrigen.stop_id == origen,
+            ),
+        )
+        .join(
+            HoraDestino,
+            and_(
+                HoraDestino.trip_id == TripSchedule.id,
+                HoraDestino.stop_id == destino,
+            ),
+        )
         .filter(
-            TripSchedule.route_id == ruta_encontrada,
-            TripSchedule.day_type == dia
+            TripSchedule.day_type == dia,
+            HoraDestino.time_value > HoraOrigen.time_value,
         )
+        .distinct()
         .all()
     )
 
-    resultados = []
-
-    for trip in trips:
-        hora_origen = (
-            db.query(TripStopTime)
-            .filter(
-                TripStopTime.trip_id == trip.id,
-                TripStopTime.stop_id == origen
-            )
-            .first()
-        )
-
-        hora_destino = (
-            db.query(TripStopTime)
-            .filter(
-                TripStopTime.trip_id == trip.id,
-                TripStopTime.stop_id == destino
-            )
-            .first()
-        )
-
-        if hora_origen and hora_destino:
-            resultados.append({
-                "salida": hora_origen.time_value,
-                "llegada": hora_destino.time_value
-            })
+    resultados = [
+        {
+            "ruta": viaje.route_id,
+            "salida": viaje.salida,
+            "llegada": viaje.llegada,
+        }
+        for viaje in viajes
+    ]
 
     resultados.sort(key=lambda x: x["salida"])
 
+    rutas = sorted({
+        resultado["ruta"]
+        for resultado in resultados
+    })
+
     return {
-        "ruta": ruta_encontrada,
-        "horarios": resultados
+        # Compatibilidad con la respuesta anterior
+        "ruta": rutas[0] if len(rutas) == 1 else None,
+
+        # Ahora podemos tener varias rutas
+        "rutas": rutas,
+
+        "horarios": resultados,
     }
