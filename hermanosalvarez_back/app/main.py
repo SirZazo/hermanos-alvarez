@@ -1,30 +1,301 @@
-from fastapi import FastAPI, Depends
+import logging
+import os
+from enum import Enum
+
+from fastapi import Depends, FastAPI, Query, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+from fastapi.responses import JSONResponse
 from sqlalchemy import and_
+from sqlalchemy.orm import Session, aliased
 
 from app.db import get_db
-from app.models import Stop, Route, RouteStop, TripSchedule, TripStopTime
+from app.models import Stop, RouteStop, TripSchedule, TripStopTime
 
-app = FastAPI(title="Autocares Hermanos Álvarez API")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+# ============================================================
+# CONFIGURACIÓN
+# ============================================================
+
+class DiaServicio(str, Enum):
+    laborable = "laborable"
+    sabado = "sabado"
+    domingo_festivos = "domingo_festivos"
+
+
+VERCEL_ENV = os.getenv(
+    "VERCEL_ENV",
+    "development",
+).lower()
+
+IS_PRODUCTION = VERCEL_ENV == "production"
+
+logger = logging.getLogger("uvicorn.error")
+
+
+# ============================================================
+# APLICACIÓN FASTAPI
+# ============================================================
+
+app = FastAPI(
+    title="Autocares Hermanos Álvarez API",
+
+    # Swagger disponible durante desarrollo.
+    # En producción no exponemos documentación ni OpenAPI.
+    docs_url=None if IS_PRODUCTION else "/docs",
+    redoc_url=None if IS_PRODUCTION else "/redoc",
+    openapi_url=None if IS_PRODUCTION else "/openapi.json",
 )
 
 
+# ============================================================
+# CORS
+# ============================================================
+
+ALLOWED_ORIGINS = [
+    # Desarrollo local
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+
+    # Producción
+    "https://hermanos-alvarez-web.vercel.app",
+]
+
+
+app.add_middleware(
+    CORSMiddleware,
+
+    # Solo nuestras aplicaciones pueden realizar
+    # peticiones desde un navegador.
+    allow_origins=ALLOWED_ORIGINS,
+
+    # Actualmente no utilizamos cookies de autenticación
+    # ni credenciales cross-origin.
+    allow_credentials=False,
+
+    # La API pública actual solo necesita GET.
+    allow_methods=["GET"],
+
+    # Cabeceras aceptadas.
+    allow_headers=["Content-Type"],
+)
+
+
+# ============================================================
+# CABECERAS DE SEGURIDAD
+# ============================================================
+
+@app.middleware("http")
+async def add_security_headers(
+    request: Request,
+    call_next,
+):
+    response = await call_next(request)
+
+    # Evita que el navegador intente adivinar
+    # tipos MIME diferentes a los declarados.
+    response.headers["X-Content-Type-Options"] = "nosniff"
+
+    # Impide que la API pueda mostrarse dentro de iframes.
+    response.headers["X-Frame-Options"] = "DENY"
+
+    # Evita enviar información del origen al navegar.
+    response.headers["Referrer-Policy"] = "no-referrer"
+
+    # La API no necesita acceso a estas capacidades
+    # del navegador.
+    response.headers["Permissions-Policy"] = (
+        "camera=(), "
+        "microphone=(), "
+        "geolocation=()"
+    )
+
+    # Esta CSP es adecuada para una API JSON,
+    # pero NO la aplicamos en desarrollo porque
+    # rompería Swagger /docs.
+    if IS_PRODUCTION:
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'none'; "
+            "frame-ancestors 'none'; "
+            "base-uri 'none'; "
+            "form-action 'none'"
+        )
+
+    return response
+
+
+# ============================================================
+# VALIDACIÓN DE PETICIONES
+# ============================================================
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: Request,
+    exc: RequestValidationError,
+):
+    """
+    En desarrollo mantenemos los errores detallados de FastAPI
+    para poder depurar.
+
+    En producción evitamos devolver al cliente todos los datos
+    introducidos en una petición inválida.
+    """
+
+    if not IS_PRODUCTION:
+        return await request_validation_exception_handler(
+            request,
+            exc,
+        )
+
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": "Parámetros de solicitud no válidos.",
+        },
+    )
+
+
+# ============================================================
+# MANEJO GLOBAL DE ERRORES
+# ============================================================
+
+@app.exception_handler(Exception)
+async def global_exception_handler(
+    request: Request,
+    exc: Exception,
+):
+    """
+    Registra internamente el error pero nunca devuelve
+    detalles técnicos al cliente.
+    """
+
+    logger.error(
+        "Error interno en %s %s",
+        request.method,
+        request.url.path,
+        exc_info=(
+            type(exc),
+            exc,
+            exc.__traceback__,
+        ),
+    )
+
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Error interno del servidor.",
+        },
+    )
+
+
+# ============================================================
+# ROOT
+# ============================================================
+
 @app.get("/")
 def root():
-    return {"mensaje": "API funcionando 🚀"}
+    return {
+        "mensaje": "API funcionando 🚀",
+    }
 
+
+# ============================================================
+# PARADAS
+# ============================================================
 
 @app.get("/paradas")
-def get_paradas(db: Session = Depends(get_db)):
-    stops = db.query(Stop).all()
+def get_paradas(
+    dia: DiaServicio | None = Query(
+        default=None,
+    ),
+    db: Session = Depends(get_db),
+):
+    """
+    Devuelve las paradas disponibles.
+
+    Si se indica un día, devuelve únicamente las paradas
+    desde las que se puede iniciar realmente algún viaje.
+    """
+
+    # --------------------------------------------------------
+    # Sin día: devolver todas las paradas
+    # --------------------------------------------------------
+
+    if dia is None:
+        stops = db.query(Stop).all()
+
+    # --------------------------------------------------------
+    # Con día: solo orígenes disponibles
+    # --------------------------------------------------------
+
+    else:
+        OrigenRouteStop = aliased(RouteStop)
+        DestinoRouteStop = aliased(RouteStop)
+
+        HoraOrigen = aliased(TripStopTime)
+        HoraDestino = aliased(TripStopTime)
+
+        stops = (
+            db.query(Stop)
+
+            .join(
+                OrigenRouteStop,
+                OrigenRouteStop.stop_id == Stop.id,
+            )
+
+            .join(
+                DestinoRouteStop,
+                and_(
+                    DestinoRouteStop.route_id
+                    == OrigenRouteStop.route_id,
+
+                    DestinoRouteStop.stop_order
+                    > OrigenRouteStop.stop_order,
+                ),
+            )
+
+            .join(
+                TripSchedule,
+                and_(
+                    TripSchedule.route_id
+                    == OrigenRouteStop.route_id,
+
+                    TripSchedule.day_type
+                    == dia.value,
+                ),
+            )
+
+            .join(
+                HoraOrigen,
+                and_(
+                    HoraOrigen.trip_id
+                    == TripSchedule.id,
+
+                    HoraOrigen.stop_id
+                    == OrigenRouteStop.stop_id,
+                ),
+            )
+
+            .join(
+                HoraDestino,
+                and_(
+                    HoraDestino.trip_id
+                    == TripSchedule.id,
+
+                    HoraDestino.stop_id
+                    == DestinoRouteStop.stop_id,
+                ),
+            )
+
+            .filter(
+                HoraDestino.time_value
+                > HoraOrigen.time_value,
+            )
+
+            .distinct()
+            .all()
+        )
 
     resultado = [
         {
@@ -35,72 +306,103 @@ def get_paradas(db: Session = Depends(get_db)):
         for stop in stops
     ]
 
-    resultado.sort(key=lambda x: x["nombre"])
+    resultado.sort(
+        key=lambda x: x["nombre"],
+    )
+
     return resultado
 
 
+# ============================================================
+# DESTINOS VÁLIDOS
+# ============================================================
+
 @app.get("/destinos-validos")
-def get_destinos_validos(origen: str, dia: str = "laborable", db: Session = Depends(get_db)):
-    # Rutas donde aparece el origen
-    route_stops_origen = (
-        db.query(RouteStop)
-        .filter(RouteStop.stop_id == origen)
-        .all()
-    )
+def get_destinos_validos(
+    origen: str = Query(
+        ...,
+        min_length=1,
+        max_length=64,
+    ),
 
-    destinos_validos = set()
+    dia: DiaServicio = Query(
+        default=DiaServicio.laborable,
+    ),
 
-    for origen_rs in route_stops_origen:
-        # Paradas posteriores en la misma ruta
-        siguientes_paradas = (
-            db.query(RouteStop)
-            .filter(
-                RouteStop.route_id == origen_rs.route_id,
-                RouteStop.stop_order > origen_rs.stop_order
-            )
-            .all()
-        )
+    db: Session = Depends(get_db),
+):
+    """
+    Devuelve los destinos realmente alcanzables desde
+    un origen para el tipo de día seleccionado.
+    """
 
-        if not siguientes_paradas:
-            continue
+    OrigenRouteStop = aliased(RouteStop)
+    DestinoRouteStop = aliased(RouteStop)
 
-        # Viajes de esa ruta y ese día
-        trips = (
-            db.query(TripSchedule)
-            .filter(
-                TripSchedule.route_id == origen_rs.route_id,
-                TripSchedule.day_type == dia
-            )
-            .all()
-        )
-
-        for destino_rs in siguientes_paradas:
-            for trip in trips:
-                hora_origen = (
-                    db.query(TripStopTime)
-                    .filter(
-                        TripStopTime.trip_id == trip.id,
-                        TripStopTime.stop_id == origen
-                    )
-                    .first()
-                )
-
-                hora_destino = (
-                    db.query(TripStopTime)
-                    .filter(
-                        TripStopTime.trip_id == trip.id,
-                        TripStopTime.stop_id == destino_rs.stop_id
-                    )
-                    .first()
-                )
-
-                if hora_origen and hora_destino and hora_destino.time_value > hora_origen.time_value:
-                    destinos_validos.add(destino_rs.stop_id)
-                    break
+    HoraOrigen = aliased(TripStopTime)
+    HoraDestino = aliased(TripStopTime)
 
     paradas = (
         db.query(Stop)
-        .filter(Stop.id.in_(destinos_validos))
+
+        .join(
+            DestinoRouteStop,
+            DestinoRouteStop.stop_id == Stop.id,
+        )
+
+        .join(
+            OrigenRouteStop,
+            and_(
+                OrigenRouteStop.route_id
+                == DestinoRouteStop.route_id,
+
+                OrigenRouteStop.stop_id
+                == origen,
+
+                OrigenRouteStop.stop_order
+                < DestinoRouteStop.stop_order,
+            ),
+        )
+
+        .join(
+            TripSchedule,
+            and_(
+                TripSchedule.route_id
+                == OrigenRouteStop.route_id,
+
+                TripSchedule.day_type
+                == dia.value,
+            ),
+        )
+
+        .join(
+            HoraOrigen,
+            and_(
+                HoraOrigen.trip_id
+                == TripSchedule.id,
+
+                HoraOrigen.stop_id
+                == origen,
+            ),
+        )
+
+        .join(
+            HoraDestino,
+            and_(
+                HoraDestino.trip_id
+                == TripSchedule.id,
+
+                HoraDestino.stop_id
+                == DestinoRouteStop.stop_id,
+            ),
+        )
+
+        .filter(
+            HoraDestino.time_value
+            > HoraOrigen.time_value,
+        )
+
+        .distinct()
         .all()
     )
 
@@ -113,77 +415,149 @@ def get_destinos_validos(origen: str, dia: str = "laborable", db: Session = Depe
         for parada in paradas
     ]
 
-    resultado.sort(key=lambda x: x["nombre"])
+    resultado.sort(
+        key=lambda x: x["nombre"],
+    )
+
     return resultado
 
 
+# ============================================================
+# HORARIOS
+# ============================================================
+
 @app.get("/horarios")
-def get_horarios(origen: str, destino: str, dia: str, db: Session = Depends(get_db)):
-    # Buscar rutas donde origen y destino estén en orden correcto
-    origen_rows = (
-        db.query(RouteStop)
-        .filter(RouteStop.stop_id == origen)
-        .all()
-    )
+def get_horarios(
+    origen: str = Query(
+        ...,
+        min_length=1,
+        max_length=64,
+    ),
 
-    ruta_encontrada = None
+    destino: str = Query(
+        ...,
+        min_length=1,
+        max_length=64,
+    ),
 
-    for origen_rs in origen_rows:
-        destino_rs = (
-            db.query(RouteStop)
-            .filter(
-                RouteStop.route_id == origen_rs.route_id,
-                RouteStop.stop_id == destino
-            )
-            .first()
+    dia: DiaServicio = Query(...),
+
+    db: Session = Depends(get_db),
+):
+    """
+    Devuelve todos los horarios disponibles entre
+    un origen y un destino para el día seleccionado.
+    """
+
+    OrigenRouteStop = aliased(RouteStop)
+    DestinoRouteStop = aliased(RouteStop)
+
+    HoraOrigen = aliased(TripStopTime)
+    HoraDestino = aliased(TripStopTime)
+
+    viajes = (
+        db.query(
+            TripSchedule.route_id,
+
+            HoraOrigen.time_value.label(
+                "salida",
+            ),
+
+            HoraDestino.time_value.label(
+                "llegada",
+            ),
         )
 
-        if destino_rs and origen_rs.stop_order < destino_rs.stop_order:
-            ruta_encontrada = origen_rs.route_id
-            break
+        .join(
+            OrigenRouteStop,
+            and_(
+                OrigenRouteStop.route_id
+                == TripSchedule.route_id,
 
-    if ruta_encontrada is None:
-        return {"ruta": None, "horarios": []}
+                OrigenRouteStop.stop_id
+                == origen,
+            ),
+        )
 
-    trips = (
-        db.query(TripSchedule)
+        .join(
+            DestinoRouteStop,
+            and_(
+                DestinoRouteStop.route_id
+                == TripSchedule.route_id,
+
+                DestinoRouteStop.stop_id
+                == destino,
+
+                DestinoRouteStop.stop_order
+                > OrigenRouteStop.stop_order,
+            ),
+        )
+
+        .join(
+            HoraOrigen,
+            and_(
+                HoraOrigen.trip_id
+                == TripSchedule.id,
+
+                HoraOrigen.stop_id
+                == origen,
+            ),
+        )
+
+        .join(
+            HoraDestino,
+            and_(
+                HoraDestino.trip_id
+                == TripSchedule.id,
+
+                HoraDestino.stop_id
+                == destino,
+            ),
+        )
+
         .filter(
-            TripSchedule.route_id == ruta_encontrada,
-            TripSchedule.day_type == dia
+            TripSchedule.day_type
+            == dia.value,
+
+            HoraDestino.time_value
+            > HoraOrigen.time_value,
         )
+
+        .distinct()
         .all()
     )
 
-    resultados = []
+    resultados = [
+        {
+            "ruta": viaje.route_id,
+            "salida": viaje.salida,
+            "llegada": viaje.llegada,
+        }
+        for viaje in viajes
+    ]
 
-    for trip in trips:
-        hora_origen = (
-            db.query(TripStopTime)
-            .filter(
-                TripStopTime.trip_id == trip.id,
-                TripStopTime.stop_id == origen
-            )
-            .first()
-        )
+    resultados.sort(
+        key=lambda x: x["salida"],
+    )
 
-        hora_destino = (
-            db.query(TripStopTime)
-            .filter(
-                TripStopTime.trip_id == trip.id,
-                TripStopTime.stop_id == destino
-            )
-            .first()
-        )
-
-        if hora_origen and hora_destino:
-            resultados.append({
-                "salida": hora_origen.time_value,
-                "llegada": hora_destino.time_value
-            })
-
-    resultados.sort(key=lambda x: x["salida"])
+    rutas = sorted(
+        {
+            resultado["ruta"]
+            for resultado in resultados
+        }
+    )
 
     return {
-        "ruta": ruta_encontrada,
-        "horarios": resultados
+        # Compatibilidad con versiones anteriores
+        "ruta": (
+            rutas[0]
+            if len(rutas) == 1
+            else None
+        ),
+
+        # Todas las rutas compatibles
+        "rutas": rutas,
+
+        # Horarios disponibles
+        "horarios": resultados,
     }
