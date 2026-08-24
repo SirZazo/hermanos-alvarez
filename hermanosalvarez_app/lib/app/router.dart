@@ -4,6 +4,7 @@ import '../features/home/presentation/pages/home_page.dart';
 import '../features/horarios/pages/horarios_page.dart';
 import '../features/legal/data/legal_texts.dart';
 import '../features/legal/pages/legal_page.dart';
+import '../features/servicios_discrecionales/presentation/pages/servicios_discrecionales_page.dart';
 
 class AppRouter {
   static const String home = '/';
@@ -14,6 +15,7 @@ class AppRouter {
   static const String avisoLegal = '/aviso-legal';
   static const String privacidad = '/privacidad';
   static const String cookies = '/cookies';
+  static const String serviciosDiscrecionales = '/servicios-discrecionales';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -67,6 +69,12 @@ class AppRouter {
           ),
           settings: settings,
         );
+
+        case serviciosDiscrecionales:
+          return MaterialPageRoute(
+            builder: (_) => const ServiciosDiscrecionalesPage(),
+            settings: settings,
+          );
 
       default:
         return MaterialPageRoute(
