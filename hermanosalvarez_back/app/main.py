@@ -2,6 +2,8 @@ import logging
 import os
 from enum import Enum
 
+
+from app.schemas.solicitud_discrecional import SolicitudDiscrecional
 from fastapi import Depends, FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.exception_handlers import request_validation_exception_handler
@@ -12,7 +14,10 @@ from sqlalchemy.orm import Session, aliased
 
 from app.db import get_db
 from app.models import Stop, RouteStop, TripSchedule, TripStopTime
-
+from app.services.email_service import (
+    EmailServiceError,
+    enviar_solicitud_discrecional,
+)
 
 # ============================================================
 # CONFIGURACIÓN
@@ -75,7 +80,7 @@ app.add_middleware(
     allow_credentials=False,
 
     # La API pública actual solo necesita GET.
-    allow_methods=["GET"],
+    allow_methods=["GET","POST"],
 
     # Cabeceras aceptadas.
     allow_headers=["Content-Type"],
@@ -560,4 +565,31 @@ def get_horarios(
 
         # Horarios disponibles
         "horarios": resultados,
+    }
+
+@app.post("/solicitudes-discrecionales")
+async def crear_solicitud_discrecional(
+    solicitud: SolicitudDiscrecional,
+):
+    try:
+        await enviar_solicitud_discrecional(solicitud)
+
+    except EmailServiceError:
+        logger.exception(
+            "Error enviando solicitud discrecional."
+        )
+
+        return JSONResponse(
+            status_code=503,
+            content={
+                "detail": (
+                    "No se ha podido enviar la solicitud. "
+                    "Inténtelo de nuevo más tarde."
+                )
+            },
+        )
+
+    return {
+        "mensaje": "Solicitud enviada correctamente.",
+        "estado": "enviada",
     }
