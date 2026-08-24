@@ -63,6 +63,9 @@ ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://127.0.0.1:8080",
 
+    # Preview - development
+    "https://hermanos-alvarez-web-git-development-sirzazos-projects.vercel.app",
+
     # Producción
     "https://hermanos-alvarez-web.vercel.app",
 ]
@@ -79,8 +82,8 @@ app.add_middleware(
     # ni credenciales cross-origin.
     allow_credentials=False,
 
-    # La API pública actual solo necesita GET.
-    allow_methods=["GET","POST"],
+    # Métodos utilizados actualmente por la API.
+    allow_methods=["GET", "POST"],
 
     # Cabeceras aceptadas.
     allow_headers=["Content-Type"],
