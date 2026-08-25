@@ -65,6 +65,8 @@ app = FastAPI(
 
 if IS_PRODUCTION:
     ALLOWED_ORIGINS = [
+        "https://www.autocaresalvarezhnos.es",
+        "https://autocaresalvarezhnos.es",
         "https://hermanos-alvarez-web.vercel.app",
     ]
 elif VERCEL_ENV == "preview":
