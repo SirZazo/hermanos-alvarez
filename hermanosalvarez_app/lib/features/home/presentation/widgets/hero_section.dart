@@ -140,7 +140,12 @@ class _HeroContent extends StatelessWidget {
                 child: const Text('Pedir presupuesto'),
               ),
               OutlinedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRouter.horarios,
+                  );
+                },
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
                   side: BorderSide(
