@@ -18,6 +18,11 @@ from app.services.email_service import (
     EmailServiceError,
     enviar_solicitud_discrecional,
 )
+from app.services.turnstile_service import (
+    TurnstileServiceError,
+    TurnstileVerificationError,
+    verificar_turnstile,
+)
 
 # ============================================================
 # CONFIGURACIÓN
@@ -577,7 +582,33 @@ async def crear_solicitud_discrecional(
     solicitud: SolicitudDiscrecional,
 ):
     try:
+        await verificar_turnstile(
+            solicitud.turnstile_token,
+        )
+
         await enviar_solicitud_discrecional(solicitud)
+
+    except TurnstileVerificationError:
+        return JSONResponse(
+            status_code=403,
+            content={
+                "detail": (
+                    "No se ha podido verificar la solicitud. "
+                    "Vuelva a intentarlo."
+                )
+            },
+        )
+
+    except TurnstileServiceError:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "detail": (
+                    "No se ha podido verificar la solicitud. "
+                    "Inténtelo de nuevo más tarde."
+                )
+            },
+        )
 
     except EmailServiceError:
         logger.exception(

@@ -46,6 +46,14 @@ class SolicitudDiscrecional(BaseModel):
 
     acepta_privacidad: bool
 
+    # Token generado por Cloudflare Turnstile.
+    # Es opcional mientras la protección está desactivada.
+    turnstile_token: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=2048,
+    )
+
     # Honeypot invisible para usuarios humanos.
     website: str | None = Field(
         default=None,
@@ -59,6 +67,7 @@ class SolicitudDiscrecional(BaseModel):
         "origen",
         "destino",
         "observaciones",
+        "turnstile_token",
         "website",
         mode="before",
     )
