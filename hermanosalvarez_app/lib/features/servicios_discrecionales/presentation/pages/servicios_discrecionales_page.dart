@@ -324,7 +324,7 @@ class _ServiciosDiscrecionalesPageState
     if (!_aceptaPrivacidad) {
       setState(() {
         _errorEnvio =
-            'Debes aceptar la Política de Privacidad para enviar la solicitud.';
+            'Debes confirmar que has leído la Política de Privacidad para enviar la solicitud.';
       });
 
       return;
@@ -783,7 +783,7 @@ class _ServiciosDiscrecionalesPageState
                           WrapCrossAlignment.center,
                       children: [
                         const Text(
-                          'He leído y acepto la ',
+                          'He leído la ',
                           style: TextStyle(
                             color:
                                 AppColors.textSecondary,

@@ -82,7 +82,7 @@ En caso de controversia, serán competentes los juzgados y tribunales que corres
 ''';
 
   static const String privacidad = r'''
-**Última actualización: 21 de agosto de 2026**
+**Última actualización: 25 de agosto de 2026**
 
 ## 1. Responsable del tratamiento
 
@@ -102,25 +102,47 @@ El responsable del tratamiento de los datos personales es:
 
 En función de la relación que el usuario mantenga con la empresa, podrán tratarse datos identificativos y de contacto, como nombre, apellidos, dirección de correo electrónico o teléfono; información incluida voluntariamente en consultas o comunicaciones; información necesaria para solicitar presupuestos, contratar o prestar servicios; datos administrativos, fiscales y de facturación cuando exista una relación contractual; y determinados datos técnicos de conexión o seguridad cuando sean necesarios para garantizar el funcionamiento y seguridad de los sistemas.
 
+Cuando se utilice el formulario de solicitud de servicios discrecionales, podrán tratarse específicamente los siguientes datos:
+
+- nombre;
+- empresa, cuando se indique voluntariamente;
+- teléfono;
+- dirección de correo electrónico;
+- origen y destino del viaje;
+- fecha y hora previstas de ida;
+- fecha y hora previstas de vuelta, cuando proceda;
+- número aproximado de viajeros; y
+- la información que el interesado incluya voluntariamente en el campo de observaciones.
+
+Se recomienda no incluir en el campo de observaciones datos especialmente sensibles ni información personal que no resulte necesaria para gestionar la solicitud.
+
 No se solicitarán datos personales que no sean necesarios para las finalidades correspondientes.
 
 ## 3. Finalidades y bases jurídicas
 
-Los datos facilitados mediante teléfono, correo electrónico u otros medios de contacto podrán tratarse para responder consultas, proporcionar información, gestionar solicitudes de presupuesto y adoptar medidas precontractuales solicitadas por el interesado.
+Los datos facilitados mediante el formulario de servicios discrecionales, teléfono, correo electrónico u otros medios de contacto podrán tratarse para responder consultas, proporcionar información, preparar presupuestos y gestionar solicitudes relacionadas con los servicios ofrecidos.
 
-Cuando exista una relación contractual, los datos serán utilizados para gestionar y prestar los servicios contratados y realizar las actuaciones administrativas asociadas.
+Cuando el interesado solicite información, un presupuesto o actuaciones previas a una posible contratación, el tratamiento se realizará sobre la base del artículo 6.1.b del Reglamento General de Protección de Datos (RGPD), al ser necesario para aplicar, a petición del interesado, medidas precontractuales.
 
-También podrán tratarse los datos necesarios para cumplir obligaciones legales de carácter fiscal, contable, administrativo, de transporte u otras que resulten aplicables a AUTOCARES ÁLVAREZ SERRANO HERMANOS S.L.
+Cuando exista una relación contractual, los datos serán utilizados para gestionar y prestar los servicios contratados y realizar las actuaciones administrativas asociadas, igualmente sobre la base del artículo 6.1.b del RGPD.
 
-Los datos técnicos estrictamente necesarios para proteger el sitio web, prevenir usos fraudulentos y garantizar la seguridad de los sistemas podrán tratarse sobre la base del interés legítimo del responsable, previa ponderación de los derechos de los usuarios.
+También podrán tratarse los datos necesarios para cumplir obligaciones legales de carácter fiscal, contable, administrativo, de transporte u otras que resulten aplicables a AUTOCARES ÁLVAREZ SERRANO HERMANOS S.L., sobre la base del artículo 6.1.c del RGPD.
+
+Los datos técnicos estrictamente necesarios para proteger el sitio web, prevenir usos fraudulentos y garantizar la seguridad de los sistemas podrán tratarse sobre la base del interés legítimo del responsable, de acuerdo con el artículo 6.1.f del RGPD y previa ponderación de los derechos e intereses de los usuarios.
 
 El envío de comunicaciones comerciales que requieran consentimiento únicamente se realizará cuando exista una base jurídica válida para ello. Cuando se base en consentimiento, podrá retirarse en cualquier momento.
+
+La confirmación de lectura de esta Política de Privacidad incluida en determinados formularios tiene como finalidad garantizar que el interesado ha tenido acceso a la información sobre el tratamiento de sus datos. No constituye, por sí misma, la base jurídica para gestionar una solicitud de presupuesto o adoptar medidas precontractuales.
 
 ## 4. Conservación de los datos
 
 Los datos personales se conservarán únicamente durante el tiempo necesario para cumplir la finalidad para la que fueron recogidos.
 
-Finalizada la relación o atendida la solicitud, podrán mantenerse debidamente bloqueados durante los plazos exigidos por la legislación aplicable y durante los periodos necesarios para atender posibles responsabilidades legales.
+Las solicitudes de información o presupuesto se conservarán durante el tiempo necesario para su gestión y seguimiento. Una vez atendida la solicitud, los datos podrán conservarse, debidamente limitados o bloqueados cuando proceda, durante los periodos necesarios para atender posibles responsabilidades legales.
+
+Si como consecuencia de una solicitud se formaliza una relación contractual, los datos pasarán a conservarse durante el tiempo necesario para prestar el servicio y, posteriormente, durante los plazos establecidos por las obligaciones legales aplicables.
+
+Los proveedores tecnológicos utilizados para transmitir o gestionar las comunicaciones podrán aplicar sus propios periodos de conservación de acuerdo con sus condiciones contractuales y obligaciones como encargados del tratamiento.
 
 Los datos tratados exclusivamente sobre la base del consentimiento dejarán de utilizarse para esa finalidad cuando el interesado lo retire, sin que ello afecte a la licitud del tratamiento realizado anteriormente.
 
@@ -128,15 +150,21 @@ Los datos tratados exclusivamente sobre la base del consentimiento dejarán de u
 
 Los datos personales no serán vendidos a terceros.
 
-Podrán acceder a determinados datos aquellos proveedores que presten servicios necesarios para el funcionamiento de la empresa o del sitio web, como proveedores de alojamiento, infraestructura informática, bases de datos, correo electrónico, mantenimiento o servicios profesionales, siempre bajo las correspondientes obligaciones de confidencialidad y protección de datos.
+Podrán acceder a determinados datos aquellos proveedores que presten servicios necesarios para el funcionamiento de la empresa o del sitio web, como proveedores de alojamiento, infraestructura informática, bases de datos, correo electrónico, mantenimiento o servicios profesionales, cuando dicho acceso resulte necesario para prestar sus servicios y bajo las correspondientes obligaciones de confidencialidad y protección de datos.
+
+Para el envío de las solicitudes realizadas mediante el formulario de servicios discrecionales se utiliza **Resend** como proveedor tecnológico de envío de correo electrónico. Como consecuencia de ello, los datos incluidos en la solicitud pueden ser tratados por dicho proveedor con la finalidad de realizar la transmisión del mensaje.
 
 Asimismo, los datos podrán comunicarse a administraciones públicas, juzgados, tribunales, fuerzas y cuerpos de seguridad u otros organismos cuando exista una obligación legal.
 
-## 6. Proveedores e transferencias internacionales
+## 6. Proveedores y transferencias internacionales
 
 Algunos servicios tecnológicos utilizados para el funcionamiento del sitio web pueden ser prestados por empresas que operan internacionalmente.
 
-Cuando un tratamiento implique una transferencia de datos personales fuera del Espacio Económico Europeo, AUTOCARES ÁLVAREZ SERRANO HERMANOS S.L. aplicará alguno de los mecanismos y garantías previstos en el capítulo V del RGPD, como una decisión de adecuación de la Comisión Europea o las cláusulas contractuales tipo, cuando corresponda.
+En particular, **Resend** procesa determinados datos asociados a los mensajes de correo electrónico en Estados Unidos. Conforme a la información publicada por el proveedor, las transferencias desde el Espacio Económico Europeo se encuentran amparadas, entre otros mecanismos, mediante las Cláusulas Contractuales Tipo de la Comisión Europea incorporadas a su acuerdo de tratamiento de datos y su participación en el EU-U.S. Data Privacy Framework.
+
+Resend indica actualmente que, en sus planes Free, Pro y Scale, los datos de correo electrónico y registros asociados se conservan durante 30 días mientras la cuenta permanece activa. Este periodo corresponde al tratamiento efectuado por dicho proveedor y puede variar si se modifican el servicio contratado o sus condiciones.
+
+Cuando cualquier otro tratamiento implique una transferencia de datos personales fuera del Espacio Económico Europeo, AUTOCARES ÁLVAREZ SERRANO HERMANOS S.L. aplicará alguno de los mecanismos y garantías previstos en el capítulo V del RGPD cuando resulte necesario.
 
 El sitio puede integrar servicios de Google Maps. Cuando el usuario active o utilice dicho servicio, Google puede recibir datos técnicos conforme a sus propias condiciones y política de privacidad.
 
@@ -168,7 +196,7 @@ AUTOCARES ÁLVAREZ SERRANO HERMANOS S.L. aplicará medidas técnicas y organizat
 
 ## 10. Cambios en esta política
 
-La presente Política de Privacidad podrá actualizarse como consecuencia de cambios legales, técnicos o en los tratamientos de datos realizados.
+La presente Política de Privacidad podrá actualizarse como consecuencia de cambios legales, técnicos, cambios en los proveedores utilizados o modificaciones en los tratamientos de datos realizados.
 
 La fecha de la última actualización se indicará al comienzo del documento.
 ''';
