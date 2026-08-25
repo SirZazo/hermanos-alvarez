@@ -58,10 +58,7 @@ def construir_email_solicitud(
         "from": email_from,
         "to": [email_destino] if email_destino else [],
         "reply_to": str(solicitud.email),
-        "subject": (
-            f"Nueva solicitud discrecional: "
-            f"{solicitud.origen} → {solicitud.destino}"
-        ),
+        "subject": "Nueva solicitud de servicio discrecional",
         "html": html_email,
     }
 

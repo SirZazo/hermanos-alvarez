@@ -1,8 +1,10 @@
-from datetime import date, time
+from datetime import date, datetime, time
 from enum import Enum
+from zoneinfo import ZoneInfo
 
 from pydantic import (
     BaseModel,
+    ConfigDict,
     EmailStr,
     Field,
     field_validator,
@@ -16,6 +18,8 @@ class TipoViaje(str, Enum):
 
 
 class SolicitudDiscrecional(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     nombre: str = Field(min_length=2, max_length=80)
     empresa: str | None = Field(default=None, max_length=120)
 
@@ -42,8 +46,7 @@ class SolicitudDiscrecional(BaseModel):
 
     acepta_privacidad: bool
 
-    # Campo invisible para humanos.
-    # Si un bot lo rellena, rechazamos la solicitud.
+    # Honeypot invisible para usuarios humanos.
     website: str | None = Field(
         default=None,
         max_length=200,
@@ -94,6 +97,10 @@ class SolicitudDiscrecional(BaseModel):
 
     @model_validator(mode="after")
     def validar_solicitud(self):
+        hoy = datetime.now(
+            ZoneInfo("Europe/Madrid")
+        ).date()
+
         if not self.acepta_privacidad:
             raise ValueError(
                 "Debe aceptarse la política de privacidad."
@@ -101,6 +108,21 @@ class SolicitudDiscrecional(BaseModel):
 
         if self.website:
             raise ValueError("Solicitud no válida.")
+
+        if self.fecha_ida < hoy:
+            raise ValueError(
+                "La fecha de ida no puede estar en el pasado."
+            )
+
+        if self.tipo_viaje == TipoViaje.IDA:
+            if (
+                self.fecha_vuelta is not None
+                or self.hora_vuelta is not None
+            ):
+                raise ValueError(
+                    "Un viaje solo de ida no puede incluir "
+                    "datos de vuelta."
+                )
 
         if self.tipo_viaje == TipoViaje.IDA_VUELTA:
             if self.fecha_vuelta is None:
@@ -112,6 +134,18 @@ class SolicitudDiscrecional(BaseModel):
                 raise ValueError(
                     "La fecha de vuelta no puede ser "
                     "anterior a la fecha de ida."
+                )
+
+            if (
+                self.fecha_vuelta == self.fecha_ida
+                and self.hora_ida is not None
+                and self.hora_vuelta is not None
+                and self.hora_vuelta < self.hora_ida
+            ):
+                raise ValueError(
+                    "Si la ida y la vuelta son el mismo día, "
+                    "la hora de vuelta no puede ser anterior "
+                    "a la hora de ida."
                 )
 
         return self
