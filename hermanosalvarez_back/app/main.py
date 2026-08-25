@@ -58,17 +58,19 @@ app = FastAPI(
 # CORS
 # ============================================================
 
-ALLOWED_ORIGINS = [
-    # Desarrollo local
-    "http://localhost:8080",
-    "http://127.0.0.1:8080",
-
-    # Preview - development
-    "https://hermanos-alvarez-web-git-development-sirzazos-projects.vercel.app",
-
-    # Producción
-    "https://hermanos-alvarez-web.vercel.app",
-]
+if IS_PRODUCTION:
+    ALLOWED_ORIGINS = [
+        "https://hermanos-alvarez-web.vercel.app",
+    ]
+elif VERCEL_ENV == "preview":
+    ALLOWED_ORIGINS = [
+        "https://hermanos-alvarez-web-git-development-sirzazos-projects.vercel.app",
+    ]
+else:
+    ALLOWED_ORIGINS = [
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+    ]
 
 
 app.add_middleware(
