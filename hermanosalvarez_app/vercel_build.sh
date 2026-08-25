@@ -18,6 +18,7 @@ echo "Compilando Flutter Web..."
 
 flutter build web \
   --release \
-  --dart-define=API_BASE_URL="$API_BASE_URL"
+  --dart-define=API_BASE_URL="$API_BASE_URL" \
+  --dart-define=TURNSTILE_SITE_KEY="$TURNSTILE_SITE_KEY"
 
 echo "Build terminado."

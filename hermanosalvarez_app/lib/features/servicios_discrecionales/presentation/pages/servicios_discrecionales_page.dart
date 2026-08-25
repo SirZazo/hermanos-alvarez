@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../app/router.dart';
+import '../../../../core/security/turnstile_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_decorations.dart';
 import '../../../../shared/widgets/app_shell.dart';
@@ -21,6 +22,7 @@ class _ServiciosDiscrecionalesPageState
   final _formKey = GlobalKey<FormState>();
 
   final _apiService = SolicitudesApiService();
+  final _turnstileService = TurnstileService();
 
   final _nombreController = TextEditingController();
   final _empresaController = TextEditingController();
@@ -91,48 +93,29 @@ class _ServiciosDiscrecionalesPageState
     return InputDecoration(
       labelText: label,
       hintText: hint,
-      prefixIcon: Icon(
-        icon,
-        color: AppColors.textMuted,
-        size: 21,
-      ),
+      prefixIcon: Icon(icon, color: AppColors.textMuted, size: 21),
       filled: true,
       fillColor: AppColors.surfaceSoft,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 18,
-        vertical: 18,
-      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(
-          color: AppColors.border,
-        ),
+        borderSide: const BorderSide(color: AppColors.border),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(
-          color: AppColors.border,
-        ),
+        borderSide: const BorderSide(color: AppColors.border),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(
-          color: AppColors.primary,
-          width: 1.7,
-        ),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.7),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(
-          color: Colors.redAccent,
-        ),
+        borderSide: const BorderSide(color: Colors.redAccent),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(
-          color: Colors.redAccent,
-          width: 1.5,
-        ),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
       ),
     );
   }
@@ -143,11 +126,7 @@ class _ServiciosDiscrecionalesPageState
     final seleccion = await showDatePicker(
       context: context,
       initialDate: _fechaIda ?? ahora,
-      firstDate: DateTime(
-        ahora.year,
-        ahora.month,
-        ahora.day,
-      ),
+      firstDate: DateTime(ahora.year, ahora.month, ahora.day),
       lastDate: DateTime(ahora.year + 3),
     );
 
@@ -158,8 +137,7 @@ class _ServiciosDiscrecionalesPageState
     setState(() {
       _fechaIda = seleccion;
 
-      if (_fechaVuelta != null &&
-          _fechaVuelta!.isBefore(seleccion)) {
+      if (_fechaVuelta != null && _fechaVuelta!.isBefore(seleccion)) {
         _fechaVuelta = null;
         _horaVuelta = null;
       }
@@ -184,12 +162,8 @@ class _ServiciosDiscrecionalesPageState
   Future<void> _seleccionarFechaVuelta() async {
     final ahora = DateTime.now();
 
-    final primeraFecha = _fechaIda ??
-        DateTime(
-          ahora.year,
-          ahora.month,
-          ahora.day,
-        );
+    final primeraFecha =
+        _fechaIda ?? DateTime(ahora.year, ahora.month, ahora.day);
 
     final seleccion = await showDatePicker(
       context: context,
@@ -229,9 +203,7 @@ class _ServiciosDiscrecionalesPageState
       return 'Introduce tu correo electrónico.';
     }
 
-    final formato = RegExp(
-      r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
-    );
+    final formato = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
     if (!formato.hasMatch(email)) {
       return 'Introduce un correo electrónico válido.';
@@ -295,8 +267,7 @@ class _ServiciosDiscrecionalesPageState
         _fechaVuelta != null &&
         _fechaVuelta!.isBefore(_fechaIda!)) {
       setState(() {
-        _errorEnvio =
-            'La fecha de vuelta no puede ser anterior a la ida.';
+        _errorEnvio = 'La fecha de vuelta no puede ser anterior a la ida.';
       });
 
       return false;
@@ -330,15 +301,15 @@ class _ServiciosDiscrecionalesPageState
       return;
     }
 
-    final viajeros = int.parse(
-      _viajerosController.text.trim(),
-    );
+    final viajeros = int.parse(_viajerosController.text.trim());
 
     setState(() {
       _enviando = true;
     });
 
     try {
+      final turnstileToken = await _turnstileService.obtenerToken();
+
       await _apiService.enviarSolicitud(
         nombre: _nombreController.text,
         empresa: _empresaController.text,
@@ -347,19 +318,18 @@ class _ServiciosDiscrecionalesPageState
         origen: _origenController.text,
         destino: _destinoController.text,
         fechaIda: _fechaApi(_fechaIda!),
-        horaIda:
-            _horaIda == null ? null : _horaApi(_horaIda!),
+        horaIda: _horaIda == null ? null : _horaApi(_horaIda!),
         necesitaVuelta: _necesitaVuelta,
         fechaVuelta: _necesitaVuelta && _fechaVuelta != null
             ? _fechaApi(_fechaVuelta!)
             : null,
-        horaVuelta:
-            _necesitaVuelta && _horaVuelta != null
-                ? _horaApi(_horaVuelta!)
-                : null,
+        horaVuelta: _necesitaVuelta && _horaVuelta != null
+            ? _horaApi(_horaVuelta!)
+            : null,
         viajeros: viajeros,
         observaciones: _observacionesController.text,
         aceptaPrivacidad: _aceptaPrivacidad,
+        turnstileToken: turnstileToken,
       );
 
       if (!mounted) {
@@ -369,6 +339,14 @@ class _ServiciosDiscrecionalesPageState
       setState(() {
         _enviadoCorrectamente = true;
         _errorEnvio = null;
+      });
+    } on TurnstileException catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _errorEnvio = e.message;
       });
     } on SolicitudApiException catch (e) {
       if (!mounted) {
@@ -407,19 +385,11 @@ class _ServiciosDiscrecionalesPageState
             children: [
               Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: 1100,
-                  ),
+                  constraints: const BoxConstraints(maxWidth: 1100),
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      24,
-                      38,
-                      24,
-                      0,
-                    ),
+                    padding: const EdgeInsets.fromLTRB(24, 38, 24, 0),
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildHeader(),
                         const SizedBox(height: 28),
@@ -440,10 +410,7 @@ class _ServiciosDiscrecionalesPageState
   Widget _buildHeader() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 28,
-        vertical: 28,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 28),
       decoration: AppDecorations.softPanel(),
       child: const Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -495,9 +462,7 @@ class _ServiciosDiscrecionalesPageState
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(28),
-      decoration: AppDecorations.card(
-        radius: 18,
-      ),
+      decoration: AppDecorations.card(radius: 18),
       child: Form(
         key: _formKey,
         child: Column(
@@ -506,8 +471,7 @@ class _ServiciosDiscrecionalesPageState
             _SectionTitle(
               icon: Icons.person_outline_rounded,
               title: 'Datos de contacto',
-              subtitle:
-                  'Indícanos cómo podemos ponernos en contacto contigo.',
+              subtitle: 'Indícanos cómo podemos ponernos en contacto contigo.',
             ),
             const SizedBox(height: 22),
 
@@ -519,9 +483,7 @@ class _ServiciosDiscrecionalesPageState
                   decoration: _inputDecoration(
                     label: 'Nombre y apellidos *',
                     icon: Icons.person_outline,
-                  ).copyWith(
-                    counterText: '',
-                  ),
+                  ).copyWith(counterText: ''),
                   validator: (value) {
                     final texto = value?.trim() ?? '';
 
@@ -539,9 +501,7 @@ class _ServiciosDiscrecionalesPageState
                     label: 'Empresa',
                     icon: Icons.business_outlined,
                     hint: 'Opcional',
-                  ).copyWith(
-                    counterText: '',
-                  ),
+                  ).copyWith(counterText: ''),
                 ),
                 TextFormField(
                   controller: _telefonoController,
@@ -549,22 +509,17 @@ class _ServiciosDiscrecionalesPageState
                   keyboardType: TextInputType.phone,
                   inputFormatters: [
                     LengthLimitingTextInputFormatter(25),
-                    FilteringTextInputFormatter.allow(
-                      RegExp(r'[0-9+\-(). ]'),
-                    ),
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9+\-(). ]')),
                   ],
                   decoration: _inputDecoration(
                     label: 'Teléfono *',
                     icon: Icons.phone_outlined,
-                  ).copyWith(
-                    counterText: '',
-                  ),
+                  ).copyWith(counterText: ''),
                   validator: _validarTelefono,
                 ),
                 TextFormField(
                   controller: _emailController,
-                  keyboardType:
-                      TextInputType.emailAddress,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: _inputDecoration(
                     label: 'Correo electrónico *',
                     icon: Icons.email_outlined,
@@ -595,9 +550,7 @@ class _ServiciosDiscrecionalesPageState
                     label: 'Origen *',
                     icon: Icons.trip_origin_rounded,
                     hint: 'Ej. Torrijos',
-                  ).copyWith(
-                    counterText: '',
-                  ),
+                  ).copyWith(counterText: ''),
                   validator: (value) {
                     if ((value?.trim().length ?? 0) < 2) {
                       return 'Indica el lugar de origen.';
@@ -613,9 +566,7 @@ class _ServiciosDiscrecionalesPageState
                     label: 'Destino *',
                     icon: Icons.location_on_outlined,
                     hint: 'Ej. Madrid',
-                  ).copyWith(
-                    counterText: '',
-                  ),
+                  ).copyWith(counterText: ''),
                   validator: (value) {
                     if ((value?.trim().length ?? 0) < 2) {
                       return 'Indica el destino.';
@@ -646,13 +597,8 @@ class _ServiciosDiscrecionalesPageState
             const SizedBox(height: 20),
 
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 18,
-                vertical: 8,
-              ),
-              decoration: AppDecorations.softPanel(
-                radius: 14,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+              decoration: AppDecorations.softPanel(radius: 14),
               child: SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 activeTrackColor: AppColors.primary,
@@ -665,9 +611,7 @@ class _ServiciosDiscrecionalesPageState
                 ),
                 subtitle: const Text(
                   'Actívalo si el servicio incluye regreso.',
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                  ),
+                  style: TextStyle(color: AppColors.textSecondary),
                 ),
                 value: _necesitaVuelta,
                 onChanged: (value) {
@@ -692,8 +636,7 @@ class _ServiciosDiscrecionalesPageState
                     value: _fechaVuelta == null
                         ? 'Seleccionar fecha'
                         : _fechaVisible(_fechaVuelta!),
-                    icon:
-                        Icons.event_available_outlined,
+                    icon: Icons.event_available_outlined,
                     onTap: _seleccionarFechaVuelta,
                   ),
                   _SelectionField(
@@ -711,15 +654,11 @@ class _ServiciosDiscrecionalesPageState
             const SizedBox(height: 20),
 
             ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: 520,
-              ),
+              constraints: const BoxConstraints(maxWidth: 520),
               child: TextFormField(
                 controller: _viajerosController,
                 keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: _inputDecoration(
                   label: 'Número de viajeros *',
                   icon: Icons.groups_outlined,
@@ -759,65 +698,48 @@ class _ServiciosDiscrecionalesPageState
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(18),
-              decoration: AppDecorations.softPanel(
-                radius: 14,
-              ),
+              decoration: AppDecorations.softPanel(radius: 14),
               child: Row(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Checkbox(
                     value: _aceptaPrivacidad,
                     activeColor: AppColors.primary,
                     onChanged: (value) {
                       setState(() {
-                        _aceptaPrivacidad =
-                            value ?? false;
+                        _aceptaPrivacidad = value ?? false;
                       });
                     },
                   ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Wrap(
-                      crossAxisAlignment:
-                          WrapCrossAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         const Text(
                           'He leído la ',
                           style: TextStyle(
-                            color:
-                                AppColors.textSecondary,
+                            color: AppColors.textSecondary,
                             height: 1.5,
                           ),
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushNamed(
-                              context,
-                              AppRouter.privacidad,
-                            );
+                            Navigator.pushNamed(context, AppRouter.privacidad);
                           },
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.zero,
                             minimumSize: Size.zero,
-                            tapTargetSize:
-                                MaterialTapTargetSize
-                                    .shrinkWrap,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           child: const Text(
                             'Política de Privacidad',
-                            style: TextStyle(
-                              fontWeight:
-                                  FontWeight.w700,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.w700),
                           ),
                         ),
                         const Text(
                           '. *',
-                          style: TextStyle(
-                            color:
-                                AppColors.textSecondary,
-                          ),
+                          style: TextStyle(color: AppColors.textSecondary),
                         ),
                       ],
                     ),
@@ -850,24 +772,16 @@ class _ServiciosDiscrecionalesPageState
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed:
-                    _enviando ? null : _enviarFormulario,
+                onPressed: _enviando ? null : _enviarFormulario,
                 icon: _enviando
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child:
-                            CircularProgressIndicator(
-                          strokeWidth: 2.2,
-                        ),
+                        child: CircularProgressIndicator(strokeWidth: 2.2),
                       )
-                    : const Icon(
-                        Icons.send_rounded,
-                      ),
+                    : const Icon(Icons.send_rounded),
                 label: Text(
-                  _enviando
-                      ? 'Enviando solicitud...'
-                      : 'Solicitar presupuesto',
+                  _enviando ? 'Enviando solicitud...' : 'Solicitar presupuesto',
                 ),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
@@ -943,11 +857,7 @@ class _SectionTitle extends StatelessWidget {
             color: AppColors.backgroundSoft,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(
-            icon,
-            color: AppColors.primary,
-            size: 22,
-          ),
+          child: Icon(icon, color: AppColors.primary, size: 22),
         ),
         const SizedBox(width: 14),
         Expanded(
@@ -982,9 +892,7 @@ class _SectionTitle extends StatelessWidget {
 class _ResponsiveFields extends StatelessWidget {
   final List<Widget> children;
 
-  const _ResponsiveFields({
-    required this.children,
-  });
+  const _ResponsiveFields({required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -997,8 +905,7 @@ class _ResponsiveFields extends StatelessWidget {
             children: [
               for (var i = 0; i < children.length; i++) ...[
                 children[i],
-                if (i != children.length - 1)
-                  const SizedBox(height: 18),
+                if (i != children.length - 1) const SizedBox(height: 18),
               ],
             ],
           );
@@ -1040,11 +947,7 @@ class _SelectionField extends StatelessWidget {
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(
-            icon,
-            color: AppColors.textMuted,
-            size: 21,
-          ),
+          prefixIcon: Icon(icon, color: AppColors.textMuted, size: 21),
           filled: true,
           fillColor: AppColors.surfaceSoft,
           contentPadding: const EdgeInsets.symmetric(
@@ -1053,22 +956,17 @@ class _SelectionField extends StatelessWidget {
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(
-              color: AppColors.border,
-            ),
+            borderSide: const BorderSide(color: AppColors.border),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(
-              color: AppColors.border,
-            ),
+            borderSide: const BorderSide(color: AppColors.border),
           ),
         ),
         child: Text(
           value,
           style: TextStyle(
-            color: value == 'Opcional' ||
-                    value == 'Seleccionar fecha'
+            color: value == 'Opcional' || value == 'Seleccionar fecha'
                 ? AppColors.textMuted
                 : AppColors.textPrimary,
           ),
@@ -1091,9 +989,7 @@ class _StatusMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = success
-        ? const Color(0xFF287A42)
-        : const Color(0xFFB42318);
+    final color = success ? const Color(0xFF287A42) : const Color(0xFFB42318);
 
     final background = success
         ? const Color(0xFFEAF7EE)
@@ -1105,17 +1001,12 @@ class _StatusMessage extends StatelessWidget {
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: color.withValues(alpha: 0.28),
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.28)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            color: color,
-          ),
+          Icon(icon, color: color),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

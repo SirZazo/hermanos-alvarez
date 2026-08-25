@@ -8,10 +8,7 @@ class SolicitudApiException implements Exception {
   final String message;
   final int? statusCode;
 
-  const SolicitudApiException(
-    this.message, {
-    this.statusCode,
-  });
+  const SolicitudApiException(this.message, {this.statusCode});
 
   @override
   String toString() => message;
@@ -33,10 +30,9 @@ class SolicitudesApiService {
     required int viajeros,
     String? observaciones,
     required bool aceptaPrivacidad,
+    String? turnstileToken,
   }) async {
-    final uri = Uri.parse(
-      '${ApiConfig.baseUrl}/solicitudes-discrecionales',
-    );
+    final uri = Uri.parse('${ApiConfig.baseUrl}/solicitudes-discrecionales');
 
     final body = {
       'nombre': nombre.trim(),
@@ -54,6 +50,9 @@ class SolicitudesApiService {
       'observaciones': _nullableText(observaciones),
       'acepta_privacidad': aceptaPrivacidad,
 
+      // Token anti-bot de Cloudflare Turnstile.
+      'turnstile_token': _nullableText(turnstileToken),
+
       // Honeypot anti-spam.
       // Nunca se muestra al usuario.
       'website': '',
@@ -65,14 +64,10 @@ class SolicitudesApiService {
       response = await http
           .post(
             uri,
-            headers: const {
-              'Content-Type': 'application/json',
-            },
+            headers: const {'Content-Type': 'application/json'},
             body: jsonEncode(body),
           )
-          .timeout(
-            const Duration(seconds: 20),
-          );
+          .timeout(const Duration(seconds: 20));
     } catch (_) {
       throw const SolicitudApiException(
         'No se ha podido conectar con el servidor. '
@@ -85,6 +80,14 @@ class SolicitudesApiService {
     }
 
     switch (response.statusCode) {
+      case 403:
+        throw const SolicitudApiException(
+          'No hemos podido verificar que la solicitud '
+          'sea legítima. Actualiza la página e inténtalo '
+          'de nuevo.',
+          statusCode: 403,
+        );
+
       case 422:
         throw const SolicitudApiException(
           'Hay datos del formulario que no son válidos. '
