@@ -1,27 +1,113 @@
 {
   "paradas": {
-    "toledo_hu": { "nombre": "Toledo (Hospital Universitario)", "bajoDemanda": false },
-    "toledo_estacion": { "nombre": "Toledo (Estación)", "bajoDemanda": false },
-    "toledo_hospital": { "nombre": "Toledo Hospital Av. de Barber ", "bajoDemanda": false },
-    "torrijos": { "nombre": "Torrijos", "bajoDemanda": false },
-    "santo_domingo": { "nombre": "Santo Domingo", "bajoDemanda": false },
-    "campo_golf": { "nombre": "Campo de Golf (Fuensalida)", "bajoDemanda": false },
-    "portillo_toledo": { "nombre": "Portillo de Toledo", "bajoDemanda": false },
-    "fuensalida": { "nombre": "Fuensalida", "bajoDemanda": false },
-    "huecas": { "nombre": "Huecas", "bajoDemanda": false },
-    "villamiel": { "nombre": "Villamiel", "bajoDemanda": false },
-    "barcience": { "nombre": "Barcience", "bajoDemanda": false },
-    "almorox": { "nombre": "Almorox", "bajoDemanda": false },
-    "nombela": { "nombre": "Nombela", "bajoDemanda": false },
-    "escalona": { "nombre": "Escalona", "bajoDemanda": false },
-    "hormigos": { "nombre": "Hormigos", "bajoDemanda": false },
-    "maqueda": { "nombre": "Maqueda", "bajoDemanda": false },
-    "rielves": { "nombre": "Rielves", "bajoDemanda": true },
-    "paredes_escalona": { "nombre": "Paredes de Escalona", "bajoDemanda": true },
-    "aldea_cabo": { "nombre": "Aldea en Cabo", "bajoDemanda": true },
-    "quismondo": { "nombre": "Quismondo", "bajoDemanda": true }
+    "toledo_hu": {
+      "nombre": "Toledo (Hospital Universitario)",
+      "bajoDemanda": false
+    },
+    "toledo_estacion": {
+      "nombre": "Toledo (Estación)",
+      "bajoDemanda": false
+    },
+    "toledo_hospital": {
+      "nombre": "Toledo Hospital Virgen de la Salud",
+      "bajoDemanda": false
+    },
+    "torrijos": {
+      "nombre": "Torrijos",
+      "bajoDemanda": false
+    },
+    "torrijos_cedt": {
+      "nombre": "Torrijos - CEDT",
+      "bajoDemanda": false
+    },
+    "santo_domingo": {
+      "nombre": "Val de Santo Domingo",
+      "bajoDemanda": false
+    },
+    "campo_golf": {
+      "nombre": "Campo de Golf (Fuensalida)",
+      "bajoDemanda": false
+    },
+    "portillo_toledo": {
+      "nombre": "Portillo de Toledo",
+      "bajoDemanda": false
+    },
+    "fuensalida": {
+      "nombre": "Fuensalida",
+      "bajoDemanda": false
+    },
+    "huecas": {
+      "nombre": "Huecas",
+      "bajoDemanda": false
+    },
+    "villamiel": {
+      "nombre": "Villamiel",
+      "bajoDemanda": false
+    },
+    "barcience": {
+      "nombre": "Barcience",
+      "bajoDemanda": false
+    },
+    "almorox": {
+      "nombre": "Almorox",
+      "bajoDemanda": false
+    },
+    "nombela": {
+      "nombre": "Nombela",
+      "bajoDemanda": false
+    },
+    "escalona_penafiel": {
+      "nombre": "Escalona - Avda. Peñafiel con Avda. Constitución",
+      "bajoDemanda": false
+    },
+    "escalona_rotonda": {
+      "nombre": "Escalona - Rotonda confluencia N-403A - N-403",
+      "bajoDemanda": false
+    },
+    "escalona_carrasquilla": {
+      "nombre": "Escalona - Urb. Carrasquilla",
+      "bajoDemanda": false
+    },
+    "escalona_castillo": {
+      "nombre": "Escalona - Urb. Castillo",
+      "bajoDemanda": false
+    },
+    "hormigos": {
+      "nombre": "Hormigos",
+      "bajoDemanda": false
+    },
+    "maqueda": {
+      "nombre": "Maqueda",
+      "bajoDemanda": false
+    },
+    "rielves": {
+      "nombre": "Rielves",
+      "bajoDemanda": true
+    },
+    "paredes_escalona": {
+      "nombre": "Paredes de Escalona",
+      "bajoDemanda": true
+    },
+    "aldea_cabo": {
+      "nombre": "Aldea en Cabo",
+      "bajoDemanda": true
+    },
+    "quismondo": {
+      "nombre": "Quismondo",
+      "bajoDemanda": true
+    }
   },
   "rutas": {
+    "torrijos_toledo": {
+      "codigo": "torrijos_toledo",
+      "paradas": [
+        "torrijos",
+        "rielves",
+        "toledo_hospital",
+        "toledo_estacion",
+        "toledo_hu"
+      ]
+    },
     "toledo_torrijos": {
       "codigo": "toledo_torrijos",
       "paradas": [
@@ -29,6 +115,23 @@
         "toledo_estacion",
         "toledo_hospital",
         "rielves",
+        "torrijos"
+      ]
+    },
+    "almorox_torrijos": {
+      "codigo": "almorox_torrijos",
+      "paradas": [
+        "almorox",
+        "paredes_escalona",
+        "aldea_cabo",
+        "escalona_penafiel",
+        "escalona_rotonda",
+        "escalona_carrasquilla",
+        "escalona_castillo",
+        "hormigos",
+        "maqueda",
+        "quismondo",
+        "santo_domingo",
         "torrijos"
       ]
     },
@@ -40,58 +143,148 @@
         "maqueda",
         "quismondo",
         "hormigos",
-        "escalona",
+        "escalona_castillo",
+        "escalona_carrasquilla",
+        "escalona_rotonda",
+        "escalona_penafiel",
+        "aldea_cabo",
+        "paredes_escalona",
+        "almorox"
+      ]
+    },
+    "barcience_torrijos_cedt": {
+      "codigo": "barcience_torrijos_cedt",
+      "paradas": [
+        "barcience",
+        "torrijos_cedt"
+      ]
+    },
+    "torrijos_cedt_barcience": {
+      "codigo": "torrijos_cedt_barcience",
+      "paradas": [
+        "torrijos_cedt",
+        "barcience"
+      ]
+    },
+    "almorox_torrijos_cedt": {
+      "codigo": "almorox_torrijos_cedt",
+      "paradas": [
+        "almorox",
+        "paredes_escalona",
+        "aldea_cabo",
+        "nombela",
+        "escalona_penafiel",
+        "escalona_rotonda",
+        "escalona_carrasquilla",
+        "escalona_castillo",
+        "maqueda",
+        "santo_domingo",
+        "torrijos_cedt"
+      ]
+    },
+    "torrijos_cedt_almorox": {
+      "codigo": "torrijos_cedt_almorox",
+      "paradas": [
+        "torrijos_cedt",
+        "santo_domingo",
+        "maqueda",
+        "escalona_castillo",
+        "escalona_carrasquilla",
+        "escalona_rotonda",
+        "escalona_penafiel",
         "nombela",
         "aldea_cabo",
         "paredes_escalona",
         "almorox"
       ]
     },
-    "torrijos_barcience": {
-      "codigo": "torrijos_barcience",
+    "villamiel_torrijos_cedt": {
+      "codigo": "villamiel_torrijos_cedt",
       "paradas": [
-        "torrijos",
-        "campo_golf",
-        "fuensalida",
-        "huecas",
         "villamiel",
-        "barcience"
+        "huecas",
+        "portillo_toledo",
+        "fuensalida",
+        "campo_golf",
+        "torrijos_cedt"
       ]
     },
-    "almorox_torrijos": {
-      "codigo": "almorox_torrijos",
+    "torrijos_cedt_villamiel": {
+      "codigo": "torrijos_cedt_villamiel",
       "paradas": [
-        "almorox",
-        "paredes_escalona",
-        "aldea_cabo",
-        "nombela",
-        "escalona",
-        "hormigos",
-        "quismondo",
-        "maqueda",
-        "santo_domingo",
-        "villamiel",
-        "huecas",
+        "torrijos_cedt",
+        "campo_golf",
         "fuensalida",
         "portillo_toledo",
-        "campo_golf",
-        "barcience",
-        "torrijos"
+        "huecas",
+        "villamiel"
       ]
     },
-    "toledo_hu_torrijos": {
-      "codigo": "toledo_hu_torrijos",
+    "escalona_almorox": {
+      "codigo": "escalona_almorox",
       "paradas": [
-        "torrijos",
-        "rielves",
-        "toledo_hospital",
-        "toledo_estacion",
-        "toledo_hu"
+        "escalona_castillo",
+        "escalona_rotonda",
+        "escalona_penafiel",
+        "almorox"
+      ]
+    },
+    "almorox_escalona": {
+      "codigo": "almorox_escalona",
+      "paradas": [
+        "almorox",
+        "escalona_penafiel",
+        "escalona_rotonda",
+        "escalona_castillo"
       ]
     }
   },
   "horarios": {
     "laborable": {
+      "torrijos_toledo": [
+        {
+          "torrijos": "07:00",
+          "rielves": "07:10",
+          "toledo_hospital": "07:20",
+          "toledo_estacion": "07:30",
+          "toledo_hu": "07:45"
+        },
+        {
+          "torrijos": "08:15",
+          "rielves": "08:25",
+          "toledo_hospital": "08:35",
+          "toledo_estacion": "08:45",
+          "toledo_hu": "09:00"
+        },
+        {
+          "torrijos": "13:00",
+          "rielves": "13:10",
+          "toledo_hospital": "13:20",
+          "toledo_estacion": "13:30",
+          "toledo_hu": "13:45"
+        },
+        {
+          "torrijos": "14:15",
+          "rielves": "14:25",
+          "toledo_hospital": "14:35",
+          "toledo_estacion": "14:45",
+          "toledo_hu": "15:00"
+        },
+        {
+          "torrijos": "17:00",
+          "rielves": "17:10",
+          "toledo_hospital": "17:20",
+          "toledo_estacion": "17:30",
+          "toledo_hu": null
+        },
+        {
+          "torrijos": "20:00",
+          "rielves": "20:10",
+          "toledo_hospital": "20:20",
+          "toledo_estacion": "20:30",
+          "toledo_hu": "20:45"
+        }
+      ],
       "toledo_torrijos": [
         {
           "toledo_hu": "07:45",
@@ -104,14 +297,14 @@
           "toledo_hu": "10:00",
           "toledo_estacion": "10:15",
           "toledo_hospital": "10:20",
-          "rielves": "10:40",
-          "torrijos": "10:55"
+          "rielves": "10:35",
+          "torrijos": "10:45"
         },
         {
           "toledo_hu": "13:45",
           "toledo_estacion": "14:00",
-          "toledo_hospital": null,
-          "rielves": null,
+          "toledo_hospital": "14:05",
+          "rielves": "14:20",
           "torrijos": "14:30"
         },
         {
@@ -136,255 +329,207 @@
           "torrijos": "21:30"
         }
       ],
+      "almorox_torrijos": [
+        {
+          "almorox": "06:00",
+          "paredes_escalona": "06:07",
+          "aldea_cabo": "06:12",
+          "escalona_penafiel": "06:20",
+          "escalona_rotonda": "06:22",
+          "escalona_carrasquilla": "06:24",
+          "escalona_castillo": "06:26",
+          "hormigos": "06:36",
+          "maqueda": "06:45",
+          "quismondo": "06:50",
+          "santo_domingo": "07:05",
+          "torrijos": "07:15"
+        },
+        {
+          "almorox": "08:15",
+          "paredes_escalona": "08:22",
+          "aldea_cabo": "08:27",
+          "escalona_penafiel": "08:35",
+          "escalona_rotonda": "08:37",
+          "escalona_carrasquilla": "08:39",
+          "escalona_castillo": "08:41",
+          "hormigos": "08:51",
+          "maqueda": "09:00",
+          "quismondo": "09:05",
+          "santo_domingo": "09:20",
+          "torrijos": "09:30"
+        },
+        {
+          "almorox": "15:15",
+          "paredes_escalona": "15:22",
+          "aldea_cabo": "15:27",
+          "escalona_penafiel": "15:35",
+          "escalona_rotonda": "15:37",
+          "escalona_carrasquilla": "15:39",
+          "escalona_castillo": "15:41",
+          "hormigos": "15:51",
+          "maqueda": "16:00",
+          "quismondo": "16:05",
+          "santo_domingo": "16:20",
+          "torrijos": "16:30"
+        }
+      ],
       "torrijos_almorox": [
         {
           "torrijos": "06:45",
-          "santo_domingo": "06:50",
-          "maqueda": "07:00",
-          "quismondo": null,
-          "hormigos": null,
-          "escalona": "07:10",
-          "nombela": null,
-          "aldea_cabo": null,
-          "paredes_escalona": "07:20",
-          "almorox": "07:30"
-        },
-        {
-          "torrijos": "12:30",
-          "santo_domingo": "12:35",
-          "maqueda": "12:45",
-          "quismondo": null,
-          "hormigos": null,
-          "escalona": "12:50",
-          "nombela": null,
-          "aldea_cabo": null,
-          "paredes_escalona": "13:10",
-          "almorox": "13:15"
-        },
-        {
-          "torrijos": "13:00",
-          "santo_domingo": "13:10",
-          "maqueda": "13:15",
-          "quismondo": null,
-          "hormigos": "13:20",
-          "escalona": "13:30",
-          "nombela": "13:50",
-          "aldea_cabo": "14:00",
-          "paredes_escalona": "14:10",
-          "almorox": "14:15"
+          "santo_domingo": "06:55",
+          "maqueda": "07:10",
+          "quismondo": "07:15",
+          "hormigos": "07:24",
+          "escalona_castillo": "07:34",
+          "escalona_carrasquilla": "07:36",
+          "escalona_rotonda": "07:38",
+          "escalona_penafiel": "07:40",
+          "aldea_cabo": "07:48",
+          "paredes_escalona": "07:53",
+          "almorox": "08:00"
         },
         {
           "torrijos": "16:00",
           "santo_domingo": "16:10",
-          "maqueda": "16:15",
-          "quismondo": "16:20",
-          "hormigos": null,
-          "escalona": "16:25",
-          "nombela": null,
-          "aldea_cabo": "16:40",
-          "paredes_escalona": "16:45",
-          "almorox": "16:50"
+          "maqueda": "16:25",
+          "quismondo": "16:30",
+          "hormigos": "16:39",
+          "escalona_castillo": "16:49",
+          "escalona_carrasquilla": "16:51",
+          "escalona_rotonda": "16:53",
+          "escalona_penafiel": "16:55",
+          "aldea_cabo": "17:03",
+          "paredes_escalona": "17:08",
+          "almorox": "17:15"
+        },
+        {
+          "torrijos": "18:30",
+          "santo_domingo": "18:40",
+          "maqueda": "18:55",
+          "quismondo": "19:00",
+          "hormigos": "19:09",
+          "escalona_castillo": "19:19",
+          "escalona_carrasquilla": "19:21",
+          "escalona_rotonda": "19:23",
+          "escalona_penafiel": "19:25",
+          "aldea_cabo": "19:33",
+          "paredes_escalona": "19:38",
+          "almorox": "19:45"
         }
       ],
-      "torrijos_barcience": [
+      "barcience_torrijos_cedt": [
         {
-          "torrijos": "12:30",
-          "campo_golf": "12:35",
+          "barcience": "09:00",
+          "torrijos_cedt": "09:05"
+        }
+      ],
+      "torrijos_cedt_barcience": [
+        {
+          "torrijos_cedt": "12:30",
+          "barcience": "12:35"
+        }
+      ],
+      "almorox_torrijos_cedt": [
+        {
+          "almorox": "07:15",
+          "paredes_escalona": "07:22",
+          "aldea_cabo": "07:27",
+          "nombela": "07:42",
+          "escalona_penafiel": "07:54",
+          "escalona_rotonda": "07:56",
+          "escalona_carrasquilla": "07:58",
+          "escalona_castillo": "08:00",
+          "maqueda": "08:10",
+          "santo_domingo": "08:25",
+          "torrijos_cedt": "08:35"
+        }
+      ],
+      "torrijos_cedt_almorox": [
+        {
+          "torrijos_cedt": "13:00",
+          "santo_domingo": "13:10",
+          "maqueda": "13:25",
+          "escalona_castillo": "13:35",
+          "escalona_carrasquilla": "13:37",
+          "escalona_rotonda": "13:39",
+          "escalona_penafiel": "13:41",
+          "nombela": "13:53",
+          "aldea_cabo": "14:08",
+          "paredes_escalona": "14:13",
+          "almorox": "14:20"
+        }
+      ],
+      "villamiel_torrijos_cedt": [
+        {
+          "villamiel": "09:00",
+          "huecas": "09:10",
+          "portillo_toledo": "09:20",
+          "fuensalida": "09:25",
+          "campo_golf": "09:35",
+          "torrijos_cedt": "09:45"
+        }
+      ],
+      "torrijos_cedt_villamiel": [
+        {
+          "torrijos_cedt": "12:30",
+          "campo_golf": "12:40",
           "fuensalida": "12:45",
-          "huecas": "12:50",
-          "villamiel": "13:00",
-          "barcience": "13:10"
-        },
-        {
-          "torrijos": "12:30",
-          "campo_golf": null,
-          "fuensalida": null,
-          "huecas": null,
-          "villamiel": null,
-          "barcience": "12:40"
+          "portillo_toledo": "12:55",
+          "huecas": "13:05",
+          "villamiel": "13:15"
         }
       ],
-      "almorox_torrijos": [
+      "escalona_almorox": [
         {
-          "almorox": "6:00",
-          "paredes_escalona": "6:10",
-          "aldea_cabo": null,
-          "nombela": null,
-          "escalona": "6:15",
-          "hormigos": null,
-          "quismondo": null,
-          "maqueda": "6:30",
-          "santo_domingo": "6:40",
-          "villamiel": null,
-          "huecas": null,
-          "fuensalida": null,
-          "portillo_toledo": null,
-          "campo_golf": null,
-          "barcience": null,
-          "torrijos": "6:45"
+          "escalona_castillo": "06:30",
+          "escalona_rotonda": "06:38",
+          "escalona_penafiel": "06:41",
+          "almorox": "06:48"
         },
         {
-          "almorox": "7:15",
-          "paredes_escalona": "7:20",
-          "aldea_cabo": "7:25",
-          "nombela": null,
-          "escalona": "7:35",
-          "hormigos": null,
-          "quismondo": "7:45",
-          "maqueda": "8:00",
-          "santo_domingo": "8:10",
-          "villamiel": null,
-          "huecas": null,
-          "fuensalida": null,
-          "portillo_toledo": null,
-          "campo_golf": null,
-          "barcience": null,
-          "torrijos": "8:15"
+          "escalona_castillo": "10:10",
+          "escalona_rotonda": "10:18",
+          "escalona_penafiel": "10:21",
+          "almorox": "10:28"
         },
         {
-          "almorox": "8:15",
-          "paredes_escalona": "8:25",
-          "aldea_cabo": "8:35",
-          "nombela": "8:45",
-          "escalona": "8:55",
-          "hormigos": "9:00",
-          "quismondo": null,
-          "maqueda": "9:05",
-          "santo_domingo": "9:10",
-          "villamiel": null,
-          "huecas": null,
-          "fuensalida": null,
-          "portillo_toledo": null,
-          "campo_golf": null,
-          "barcience": null,
-          "torrijos": "9:20"
-        },
-        {
-          "almorox": null,
-          "paredes_escalona": null,
-          "aldea_cabo": null,
-          "nombela": null,
-          "escalona": null,
-          "hormigos": null,
-          "quismondo": null,
-          "maqueda": null,
-          "santo_domingo": null,
-          "villamiel": "9:00",
-          "huecas": "9:10",
-          "fuensalida": "9:20",
-          "portillo_toledo": "9:25",
-          "campo_golf": "9:30",
-          "barcience": null,
-          "torrijos": "9:40"
-        },
-        {
-          "almorox": null,
-          "paredes_escalona": null,
-          "aldea_cabo": null,
-          "nombela": null,
-          "escalona": null,
-          "hormigos": null,
-          "quismondo": null,
-          "maqueda": null,
-          "santo_domingo": null,
-          "villamiel": null,
-          "huecas": null,
-          "fuensalida": null,
-          "portillo_toledo": null,
-          "campo_golf": null,
-          "barcience": "9:00",
-          "torrijos": "9:10"
-        },
-        {
-          "almorox": "13:45",
-          "paredes_escalona": "13:50",
-          "aldea_cabo": null,
-          "nombela": null,
-          "escalona": "14:00",
-          "hormigos": null,
-          "quismondo": null,
-          "maqueda": "14:15",
-          "santo_domingo": "14:25",
-          "villamiel": null,
-          "huecas": null,
-          "fuensalida": null,
-          "portillo_toledo": null,
-          "campo_golf": null,
-          "barcience": null,
-          "torrijos": "14:30"
-        },
-        {
-          "almorox": "15:15",
-          "paredes_escalona": "15:25",
-          "aldea_cabo": null,
-          "nombela": null,
-          "escalona": "15:30",
-          "hormigos": null,
-          "quismondo": null,
-          "maqueda": "15:40",
-          "santo_domingo": "15:45",
-          "villamiel": null,
-          "huecas": null,
-          "fuensalida": null,
-          "portillo_toledo": null,
-          "campo_golf": null,
-          "barcience": null,
-          "torrijos": "15:50"
+          "escalona_castillo": "17:05",
+          "escalona_rotonda": "17:13",
+          "escalona_penafiel": "17:16",
+          "almorox": "17:23"
         }
       ],
-      "toledo_hu_torrijos": [
+      "almorox_escalona": [
         {
-          "torrijos": "7:00",
-          "rielves": "7:10",
-          "toledo_hospital": "7:25",
-          "toledo_estacion": "7:30",
-          "toledo_hu": "7:45"
+          "almorox": "07:45",
+          "escalona_penafiel": "07:52",
+          "escalona_rotonda": "07:55",
+          "escalona_castillo": "08:03"
         },
         {
-          "torrijos": "8:15",
-          "rielves": "8:25",
-          "toledo_hospital": "8:45",
-          "toledo_estacion": "8:50",
-          "toledo_hu": "9:00"
+          "almorox": "11:45",
+          "escalona_penafiel": "11:52",
+          "escalona_rotonda": "11:55",
+          "escalona_castillo": "12:03"
         },
         {
-          "torrijos": "13:00",
-          "rielves": "13:10",
-          "toledo_hospital": "13:20",
-          "toledo_estacion": "13:30",
-          "toledo_hu": "13:45"
-        },
-        {
-          "torrijos": "14:15",
-          "rielves": "14:25",
-          "toledo_hospital": "14:45",
-          "toledo_estacion": "14:50",
-          "toledo_hu": "15:00"
-        },
-        {
-          "torrijos": "17:00",
-          "rielves": "17:10",
-          "toledo_hospital": "17:20",
-          "toledo_estacion": "18:15",
-          "toledo_hu": null
-        },
-        {
-          "torrijos": "18:00",
-          "rielves": "18:10",
-          "toledo_hospital": "18:25",
-          "toledo_estacion": "18:30",
-          "toledo_hu": "18:45"
-        },
-        {
-          "torrijos": "20:00",
-          "rielves": "20:10",
-          "toledo_hospital": "20:25",
-          "toledo_estacion": "20:30",
-          "toledo_hu": "20:45"
+          "almorox": "18:30",
+          "escalona_penafiel": "18:37",
+          "escalona_rotonda": "18:40",
+          "escalona_castillo": "18:48"
         }
       ]
     },
     "sabado": {
+      "torrijos_toledo": [
+        {
+          "torrijos": "08:15",
+          "rielves": "08:25",
+          "toledo_hospital": "08:35",
+          "toledo_estacion": "08:45",
+          "toledo_hu": "09:00"
+        }
+      ],
       "toledo_torrijos": [
         {
           "toledo_hu": "12:30",
@@ -394,47 +539,82 @@
           "torrijos": "13:15"
         }
       ],
+      "almorox_torrijos": [
+        {
+          "almorox": "07:30",
+          "paredes_escalona": "07:37",
+          "aldea_cabo": "07:42",
+          "escalona_penafiel": "07:50",
+          "escalona_rotonda": "07:52",
+          "escalona_carrasquilla": "07:54",
+          "escalona_castillo": "07:56",
+          "hormigos": "08:06",
+          "maqueda": "08:15",
+          "quismondo": "08:20",
+          "santo_domingo": "08:35",
+          "torrijos": "08:45"
+        }
+      ],
       "torrijos_almorox": [
         {
           "torrijos": "13:00",
           "santo_domingo": "13:10",
-          "maqueda": "13:15",
-          "quismondo": "13:20",
-          "hormigos": "13:25",
-          "escalona": "13:35",
-          "nombela": null,
-          "aldea_cabo": "13:45",
-          "paredes_escalona": "13:50",
-          "almorox": "14:00"
+          "maqueda": "13:25",
+          "quismondo": "13:30",
+          "hormigos": "13:39",
+          "escalona_castillo": "13:49",
+          "escalona_carrasquilla": "13:51",
+          "escalona_rotonda": "13:53",
+          "escalona_penafiel": "13:55",
+          "aldea_cabo": "14:03",
+          "paredes_escalona": "14:08",
+          "almorox": "14:15"
         }
       ],
-      "almorox_torrijos": [
+      "escalona_almorox": [
         {
-          "almorox": "7:30",
-          "paredes_escalona": "7:35",
-          "aldea_cabo": "7:40",
-          "nombela": null,
-          "escalona": "7:50",
-          "hormigos": null,
-          "quismondo": "7:55",
-          "maqueda": "8:00",
-          "santo_domingo": "8:10",
-          "villamiel": null,
-          "huecas": null,
-          "fuensalida": null,
-          "portillo_toledo": null,
-          "campo_golf": null,
-          "barcience": null,
-          "torrijos": "9:00"
+          "escalona_castillo": "10:00",
+          "escalona_rotonda": "10:08",
+          "escalona_penafiel": "10:11",
+          "almorox": "10:18"
+        },
+        {
+          "escalona_castillo": "17:05",
+          "escalona_rotonda": "17:13",
+          "escalona_penafiel": "17:16",
+          "almorox": "17:23"
         }
       ],
-      "toledo_hu_torrijos": [
+      "almorox_escalona": [
         {
-          "torrijos": "8:15",
-          "rielves": "8:25",
-          "toledo_hospital": "8:40",
-          "toledo_estacion": "8:45",
-          "toledo_hu": "9:00"
+          "almorox": "10:25",
+          "escalona_penafiel": "10:32",
+          "escalona_rotonda": "10:35",
+          "escalona_castillo": "10:43"
+        },
+        {
+          "almorox": "18:30",
+          "escalona_penafiel": "18:37",
+          "escalona_rotonda": "18:40",
+          "escalona_castillo": "18:48"
+        }
+      ]
+    },
+    "domingo_festivos": {
+      "escalona_almorox": [
+        {
+          "escalona_castillo": "14:05",
+          "escalona_rotonda": "14:13",
+          "escalona_penafiel": "14:16",
+          "almorox": "14:23"
+        }
+      ],
+      "almorox_escalona": [
+        {
+          "almorox": "14:50",
+          "escalona_penafiel": "14:57",
+          "escalona_rotonda": "15:00",
+          "escalona_castillo": "15:08"
         }
       ]
     }

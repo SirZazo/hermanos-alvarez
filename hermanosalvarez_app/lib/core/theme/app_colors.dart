@@ -29,6 +29,18 @@ class AppColors {
   static const Color border = Color(0xFFD8E1EA);
   static const Color borderStrong = Color(0xFFB7C7D8);
 
+  // Fondos de composición
+  static const Color pageBackground = Color(0xFFF3F6FA);
+  static const Color sectionBackground = Color(0xFFEDF2F7);
+
+  // Superficies
+  static const Color cardBackground = Color.fromRGBO(255, 255, 255, 0.96);
+  static const Color cardBackgroundSoft = Color.fromRGBO(255, 255, 255, 0.82);
+
+  // Sombras
+  static const Color shadowSoft = Color.fromRGBO(9, 37, 79, 0.06);
+  static const Color shadowMedium = Color.fromRGBO(9, 37, 79, 0.10);
+
   // Básicos
   static const Color white = Colors.white;
 

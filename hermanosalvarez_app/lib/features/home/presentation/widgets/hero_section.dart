@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../app/router.dart';
 
 class HeroSection extends StatelessWidget {
   const HeroSection({super.key});
@@ -130,11 +131,21 @@ class _HeroContent extends StatelessWidget {
             runSpacing: 16,
             children: [
               ElevatedButton(
-                onPressed: () {},
-                child: const Text('Solicitar presupuesto'),
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRouter.serviciosDiscrecionales,
+                  );
+                },
+                child: const Text('Pedir presupuesto'),
               ),
               OutlinedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRouter.horarios,
+                  );
+                },
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
                   side: BorderSide(

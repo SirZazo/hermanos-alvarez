@@ -7,3 +7,15 @@ __pycache__/
 # Otros
 *.txt
 !hermanosalvarez_back/requirements.txt
+
+# Vercel
+.vercel/
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# Backups locales de datos
+hermanosalvarez_back/data/lineas_backup_*.json

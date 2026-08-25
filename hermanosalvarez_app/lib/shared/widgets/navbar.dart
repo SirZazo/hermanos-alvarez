@@ -181,15 +181,42 @@ class AppNavbarDrawer extends StatelessWidget {
                 isActive: currentRoute == AppRouter.home,
                 onTap: () {
                   Navigator.pop(context);
+
                   if (currentRoute != AppRouter.home) {
-                    Navigator.pushReplacementNamed(context, AppRouter.home);
+                    Navigator.pushReplacementNamed(
+                      context,
+                      AppRouter.home,
+                      arguments: currentRoute,
+                    );
                   }
                 },
               ),
               _DrawerItem(
                 label: 'Qué ofrecemos',
+                isActive: currentRoute == AppRouter.queOfrecemos,
                 onTap: () {
                   Navigator.pop(context);
+
+                  if (currentRoute != AppRouter.queOfrecemos) {
+                    Navigator.pushReplacementNamed(
+                      context,
+                      AppRouter.queOfrecemos,
+                    );
+                  }
+                },
+              ),
+              _DrawerItem(
+                label: 'Contacto',
+                isActive: currentRoute == AppRouter.contacto,
+                onTap: () {
+                  Navigator.pop(context);
+
+                  if (currentRoute != AppRouter.contacto) {
+                    Navigator.pushReplacementNamed(
+                      context,
+                      AppRouter.contacto,
+                    );
+                  }
                 },
               ),
               _DrawerItem(
@@ -202,12 +229,7 @@ class AppNavbarDrawer extends StatelessWidget {
                   }
                 },
               ),
-              _DrawerItem(
-                label: 'Contacto',
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
+
               const Divider(height: 28),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
@@ -293,13 +315,37 @@ class _MenuSection extends StatelessWidget {
           isActive: currentRoute == AppRouter.home,
           onTap: () {
             if (currentRoute != AppRouter.home) {
-              Navigator.pushReplacementNamed(context, AppRouter.home);
+              Navigator.pushReplacementNamed(
+                context,
+                AppRouter.home,
+                arguments: currentRoute,
+              );
             }
           },
         ),
         _NavItem(
           label: 'Qué ofrecemos',
-          onTap: () {},
+          isActive: currentRoute == AppRouter.queOfrecemos,
+          onTap: () {
+            if (currentRoute != AppRouter.queOfrecemos) {
+              Navigator.pushReplacementNamed(
+                context,
+                AppRouter.queOfrecemos,
+              );
+            }
+          },
+        ),
+        _NavItem(
+          label: 'Contacto',
+          isActive: currentRoute == AppRouter.contacto,
+          onTap: () {
+            if (currentRoute != AppRouter.contacto) {
+              Navigator.pushReplacementNamed(
+                context,
+                AppRouter.contacto,
+              );
+            }
+          },
         ),
         _NavItem(
           label: 'Horarios',
@@ -310,10 +356,7 @@ class _MenuSection extends StatelessWidget {
             }
           },
         ),
-        _NavItem(
-          label: 'Contacto',
-          onTap: () {},
-        ),
+
       ],
     );
   }

@@ -2,6 +2,8 @@ import logging
 import os
 from enum import Enum
 
+
+from app.schemas.solicitud_discrecional import SolicitudDiscrecional
 from fastapi import Depends, FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.exception_handlers import request_validation_exception_handler
@@ -12,7 +14,15 @@ from sqlalchemy.orm import Session, aliased
 
 from app.db import get_db
 from app.models import Stop, RouteStop, TripSchedule, TripStopTime
-
+from app.services.email_service import (
+    EmailServiceError,
+    enviar_solicitud_discrecional,
+)
+from app.services.turnstile_service import (
+    TurnstileServiceError,
+    TurnstileVerificationError,
+    verificar_turnstile,
+)
 
 # ============================================================
 # CONFIGURACIÓN
@@ -53,14 +63,19 @@ app = FastAPI(
 # CORS
 # ============================================================
 
-ALLOWED_ORIGINS = [
-    # Desarrollo local
-    "http://localhost:8080",
-    "http://127.0.0.1:8080",
-
-    # Producción
-    "https://hermanos-alvarez-web.vercel.app",
-]
+if IS_PRODUCTION:
+    ALLOWED_ORIGINS = [
+        "https://hermanos-alvarez-web.vercel.app",
+    ]
+elif VERCEL_ENV == "preview":
+    ALLOWED_ORIGINS = [
+        "https://hermanos-alvarez-web-git-development-sirzazos-projects.vercel.app",
+    ]
+else:
+    ALLOWED_ORIGINS = [
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+    ]
 
 
 app.add_middleware(
@@ -74,8 +89,8 @@ app.add_middleware(
     # ni credenciales cross-origin.
     allow_credentials=False,
 
-    # La API pública actual solo necesita GET.
-    allow_methods=["GET"],
+    # Métodos utilizados actualmente por la API.
+    allow_methods=["GET", "POST"],
 
     # Cabeceras aceptadas.
     allow_headers=["Content-Type"],
@@ -560,4 +575,57 @@ def get_horarios(
 
         # Horarios disponibles
         "horarios": resultados,
+    }
+
+@app.post("/solicitudes-discrecionales")
+async def crear_solicitud_discrecional(
+    solicitud: SolicitudDiscrecional,
+):
+    try:
+        await verificar_turnstile(
+            solicitud.turnstile_token,
+        )
+
+        await enviar_solicitud_discrecional(solicitud)
+
+    except TurnstileVerificationError:
+        return JSONResponse(
+            status_code=403,
+            content={
+                "detail": (
+                    "No se ha podido verificar la solicitud. "
+                    "Vuelva a intentarlo."
+                )
+            },
+        )
+
+    except TurnstileServiceError:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "detail": (
+                    "No se ha podido verificar la solicitud. "
+                    "Inténtelo de nuevo más tarde."
+                )
+            },
+        )
+
+    except EmailServiceError:
+        logger.exception(
+            "Error enviando solicitud discrecional."
+        )
+
+        return JSONResponse(
+            status_code=503,
+            content={
+                "detail": (
+                    "No se ha podido enviar la solicitud. "
+                    "Inténtelo de nuevo más tarde."
+                )
+            },
+        )
+
+    return {
+        "mensaje": "Solicitud enviada correctamente.",
+        "estado": "enviada",
     }
