@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
 
 class ValueSection extends StatelessWidget {
@@ -6,6 +7,8 @@ class ValueSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.sizeOf(context).width < 800;
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 40),
@@ -13,10 +16,9 @@ class ValueSection extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1700),
           child: Container(
-            constraints: BoxConstraints(minHeight: 430),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(0),
-              image: const DecorationImage(
+            constraints: const BoxConstraints(minHeight: 430),
+            decoration: const BoxDecoration(
+              image: DecorationImage(
                 image: AssetImage('assets/images/hero_bus.png'),
                 fit: BoxFit.cover,
               ),
@@ -26,21 +28,33 @@ class ValueSection extends StatelessWidget {
                 color: Color.fromRGBO(12, 57, 110, 0.78),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 90, vertical: 55),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Expanded(
-                      flex: 6,
-                      child: _ValueSectionContent(),
-                    ),
-                    SizedBox(width: 80),
-                    Expanded(
-                      flex: 5,
-                      child: _ValueCardsColumn(),
-                    ),
-                  ],
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 24 : 90,
+                  vertical: isMobile ? 40 : 55,
                 ),
+                child: isMobile
+                    ? const Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _ValueSectionContent(isMobile: true),
+                          SizedBox(height: 36),
+                          _ValueCardsColumn(),
+                        ],
+                      )
+                    : const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 6,
+                            child: _ValueSectionContent(),
+                          ),
+                          SizedBox(width: 80),
+                          Expanded(
+                            flex: 5,
+                            child: _ValueCardsColumn(),
+                          ),
+                        ],
+                      ),
               ),
             ),
           ),
@@ -51,14 +65,19 @@ class ValueSection extends StatelessWidget {
 }
 
 class _ValueSectionContent extends StatelessWidget {
-  const _ValueSectionContent();
+  final bool isMobile;
+
+  const _ValueSectionContent({
+    this.isMobile = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
-        Text(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text(
           'NUESTRA FORMA DE TRABAJAR',
           style: TextStyle(
             color: AppColors.accent,
@@ -67,23 +86,36 @@ class _ValueSectionContent extends StatelessWidget {
             letterSpacing: 1.2,
           ),
         ),
-        SizedBox(height: 22),
-        SizedBox(
-          width: 560,
-          child: Text(
-            'Más que transporte,\nuna experiencia de\nviaje segura',
+        const SizedBox(height: 22),
+
+        if (isMobile)
+          const Text(
+            'Más que transporte,\nuna experiencia de viaje segura',
             style: TextStyle(
               color: AppColors.white,
-              fontSize: 38,
-              height: 1.35,
+              fontSize: 34,
+              height: 1.25,
               fontWeight: FontWeight.w800,
             ),
+          )
+        else
+          const SizedBox(
+            width: 560,
+            child: Text(
+              'Más que transporte,\nuna experiencia de\nviaje segura',
+              style: TextStyle(
+                color: AppColors.white,
+                fontSize: 38,
+                height: 1.35,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
           ),
-        ),
-        SizedBox(height: 26),
-        SizedBox(
-          width: 540,
-          child: Text(
+
+        const SizedBox(height: 26),
+
+        if (isMobile)
+          const Text(
             'Cuidamos cada detalle del trayecto para que el viaje sea cómodo, puntual y bien organizado, tanto en transporte regular como en servicios especiales.',
             style: TextStyle(
               color: AppColors.white,
@@ -91,8 +123,20 @@ class _ValueSectionContent extends StatelessWidget {
               height: 1.75,
               fontWeight: FontWeight.w400,
             ),
+          )
+        else
+          const SizedBox(
+            width: 540,
+            child: Text(
+              'Cuidamos cada detalle del trayecto para que el viaje sea cómodo, puntual y bien organizado, tanto en transporte regular como en servicios especiales.',
+              style: TextStyle(
+                color: AppColors.white,
+                fontSize: 18,
+                height: 1.75,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
           ),
-        ),
       ],
     );
   }
@@ -104,6 +148,8 @@ class _ValueCardsColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
       children: [
         _ValueCard(
           title: 'Seguridad',
@@ -139,8 +185,11 @@ class _ValueCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 1000,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: 22,
+      ),
       decoration: BoxDecoration(
         color: const Color.fromRGBO(255, 255, 255, 0.10),
         borderRadius: BorderRadius.circular(18),

@@ -25,7 +25,6 @@ class CookieBanner extends StatelessWidget {
         return SafeArea(
           minimum: const EdgeInsets.all(16),
           child: Center(
-            heightFactor: 1,
             child: ConstrainedBox(
               constraints: const BoxConstraints(
                 maxWidth: 1100,
@@ -48,12 +47,11 @@ class CookieBanner extends StatelessWidget {
                       context,
                       constraints,
                     ) {
-                      final compact =
-                          constraints.maxWidth < 720;
+                      final compact = constraints.maxWidth < 720;
+                      final mobile = constraints.maxWidth < 520;
 
                       final text = Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Text(
@@ -77,53 +75,74 @@ class CookieBanner extends StatelessWidget {
                         ],
                       );
 
-                      final buttons = Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        alignment: WrapAlignment.end,
-                        children: [
-                          SizedBox(
-                            height: 44,
-                            child: OutlinedButton(
-                              onPressed: () {
-                                service.rejectAll();
-                              },
-                              child: const Text(
-                                'Rechazar',
-                              ),
-                            ),
+                      Widget outlinedAction({
+                        required String label,
+                        required VoidCallback onPressed,
+                      }) {
+                        return SizedBox(
+                          height: 44,
+                          width: mobile ? double.infinity : null,
+                          child: OutlinedButton(
+                            onPressed: onPressed,
+                            child: Text(label),
                           ),
-                          SizedBox(
-                            height: 44,
-                            child: OutlinedButton(
-                              onPressed: () {
-                                showCookieSettingsDialog(
-                                  context,
-                                );
-                              },
-                              child: const Text(
-                                'Configurar',
-                              ),
-                            ),
+                        );
+                      }
+
+                      Widget primaryAction() {
+                        return SizedBox(
+                          height: 44,
+                          width: mobile ? double.infinity : null,
+                          child: ElevatedButton(
+                            onPressed: service.acceptAll,
+                            child: const Text('Aceptar'),
                           ),
-                          SizedBox(
-                            height: 44,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                service.acceptAll();
-                              },
-                              child: const Text(
-                                'Aceptar',
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
+                        );
+                      }
+
+                      final buttons = mobile
+                          ? Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                outlinedAction(
+                                  label: 'Rechazar',
+                                  onPressed: service.rejectAll,
+                                ),
+                                const SizedBox(height: 10),
+                                outlinedAction(
+                                  label: 'Configurar',
+                                  onPressed: () {
+                                    showCookieSettingsDialog(context);
+                                  },
+                                ),
+                                const SizedBox(height: 10),
+                                primaryAction(),
+                              ],
+                            )
+                          : Wrap(
+                              spacing: 10,
+                              runSpacing: 10,
+                              alignment: WrapAlignment.end,
+                              children: [
+                                outlinedAction(
+                                  label: 'Rechazar',
+                                  onPressed: service.rejectAll,
+                                ),
+                                outlinedAction(
+                                  label: 'Configurar',
+                                  onPressed: () {
+                                    showCookieSettingsDialog(context);
+                                  },
+                                ),
+                                primaryAction(),
+                              ],
+                            );
 
                       if (compact) {
                         return Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             text,
                             const SizedBox(height: 18),
