@@ -12,7 +12,6 @@ class HermanosAlvarezApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       onGenerateRoute: AppRouter.onGenerateRoute,
-      initialRoute: AppRouter.home,
     );
   }
 }
