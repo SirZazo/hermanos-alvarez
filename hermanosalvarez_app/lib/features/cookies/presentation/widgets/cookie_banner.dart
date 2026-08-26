@@ -80,22 +80,42 @@ class CookieBanner extends StatelessWidget {
                         required VoidCallback onPressed,
                       }) {
                         return SizedBox(
-                          height: 44,
                           width: mobile ? double.infinity : null,
-                          child: OutlinedButton(
-                            onPressed: onPressed,
-                            child: Text(label),
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              minHeight: 52,
+                            ),
+                            child: OutlinedButton(
+                              onPressed: onPressed,
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 14,
+                                ),
+                              ),
+                              child: Text(label),
+                            ),
                           ),
                         );
                       }
 
                       Widget primaryAction() {
                         return SizedBox(
-                          height: 44,
                           width: mobile ? double.infinity : null,
-                          child: ElevatedButton(
-                            onPressed: service.acceptAll,
-                            child: const Text('Aceptar'),
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              minHeight: 52,
+                            ),
+                            child: ElevatedButton(
+                              onPressed: service.acceptAll,
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 14,
+                                ),
+                              ),
+                              child: const Text('Aceptar'),
+                            ),
                           ),
                         );
                       }
