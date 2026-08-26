@@ -15,7 +15,8 @@ class HorariosPage extends StatefulWidget {
 
 class _HorariosPageState extends State<HorariosPage> {
   final ApiService _apiService = ApiService();
-
+  final GlobalKey _resultsKey = GlobalKey();
+  
   bool loading = true;
   bool cargandoDestinos = false;
   String? error;
@@ -96,30 +97,54 @@ Future<void> _cargarDestinosValidos(String origen) async {
   }
 }
 
-  Future<void> _buscarHorarios() async {
-    if (origenSeleccionado == null || destinoSeleccionado == null) return;
 
-    try {
-      final resultado = await _apiService.getHorarios(
-        origen: origenSeleccionado!,
-        destino: destinoSeleccionado!,
-        dia: diaSeleccionado,
+void _scrollToResults() {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (!mounted) return;
+
+    final resultsContext = _resultsKey.currentContext;
+
+    if (resultsContext != null) {
+      Scrollable.ensureVisible(
+        resultsContext,
+        duration: const Duration(milliseconds: 550),
+        curve: Curves.easeInOut,
+        alignment: 0.08,
       );
-
-      setState(() {
-        resultadosHorarios =
-            List<Map<String, dynamic>>.from(resultado['horarios'] ?? []);
-        busquedaRealizada = true;
-        error = null;
-      });
-    } catch (e) {
-      setState(() {
-        error = e.toString();
-        resultadosHorarios = [];
-        busquedaRealizada = true;
-      });
     }
+  });
+}
+
+Future<void> _buscarHorarios() async {
+  if (origenSeleccionado == null || destinoSeleccionado == null) return;
+
+  try {
+    final resultado = await _apiService.getHorarios(
+      origen: origenSeleccionado!,
+      destino: destinoSeleccionado!,
+      dia: diaSeleccionado,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      resultadosHorarios =
+          List<Map<String, dynamic>>.from(resultado['horarios'] ?? []);
+      busquedaRealizada = true;
+      error = null;
+    });
+
+    _scrollToResults();
+  } catch (e) {
+    if (!mounted) return;
+
+    setState(() {
+      error = e.toString();
+      resultadosHorarios = [];
+      busquedaRealizada = true;
+    });
   }
+}
 
     void intercambiarOrigenDestino() {
       if (origenSeleccionado == null || destinoSeleccionado == null) return;
@@ -596,6 +621,7 @@ InputDecoration _inputDecoration({
 
   Widget _buildResultsCard() {
     return Container(
+      key: _resultsKey,
       width: double.infinity,
       padding: const EdgeInsets.all(28),
       decoration: AppDecorations.card(),
