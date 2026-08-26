@@ -16,4 +16,14 @@
     <priority>0.8</priority>
   </url>
 
+  <url>
+    <loc>https://www.autocaresalvarezhnos.es/horarios/vcm-618-torrijos-toledo</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://www.autocaresalvarezhnos.es/horarios/vcm-042-almorox-torrijos</loc>
+    <priority>0.9</priority>
+  </url>
+
 </urlset>
