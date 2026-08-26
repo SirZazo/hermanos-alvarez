@@ -41,72 +41,246 @@
 </head>
 
 <body>
-<header>
-  <nav>
-    <a class="brand" href="/">Autocares Hermanos Álvarez</a>
-    <a href="/horarios">Consultar horarios</a>
+
+<header class="site-header">
+  <nav class="nav-shell">
+
+    <a class="logo-box" href="/" aria-label="Autocares Hermanos Álvarez">
+      <img
+        src="/assets/assets/images/logo.png"
+        alt="Autocares Hermanos Álvarez"
+      >
+    </a>
+
+    <div class="nav-links">
+      <a href="/">Inicio</a>
+      <a href="/que-ofrecemos">Qué ofrecemos</a>
+      <a href="/contacto">Contacto</a>
+      <a class="active" href="/horarios">Horarios</a>
+    </div>
+
+    <div class="nav-contact">
+      <a href="tel:+34925760263">
+        <span>☎</span>925 760 263
+      </a>
+
+      <a
+        class="email-full"
+        href="mailto:f.alvarez61@hotmail.com"
+      >
+        <span>✉</span>f.alvarez61@hotmail.com
+      </a>
+    </div>
+
+    <details class="mobile-menu">
+      <summary aria-label="Abrir menú">☰</summary>
+
+      <div class="mobile-panel">
+        <a href="/">Inicio</a>
+        <a href="/que-ofrecemos">Qué ofrecemos</a>
+        <a href="/contacto">Contacto</a>
+        <a href="/horarios">Horarios</a>
+      </div>
+    </details>
+
   </nav>
 </header>
 
 <main>
+
   <div class="breadcrumb">
-    <a href="/">Inicio</a> ›
-    <a href="/horarios">Horarios</a> ›
-    VCM-618
+    <a href="/">Inicio</a>
+    ›
+    <a href="/horarios">Horarios</a>
+    › VCM-618
   </div>
 
-  <article>
-    <div class="hero">
-      <h1>Horarios de autobús Torrijos ↔ Toledo – VCM-618</h1>
+  <section class="route-hero">
 
-      <p class="lead">
-        Consulta la línea regular de autobús entre Torrijos y Toledo
-        operada por Autocares Hermanos Álvarez. Utiliza nuestro buscador
-        para comprobar los horarios disponibles según el día del servicio.
+    <div class="hero-content">
+
+      <p class="eyebrow">
+        VCM-618 · Transporte regular
       </p>
 
-      <div class="actions">
-        <a class="button" href="/horarios">
-          Consultar horarios actualizados
+      <h1>
+        Autobús Torrijos ↔ Toledo
+      </h1>
+
+      <p class="hero-description">
+        Consulta el recorrido y las principales paradas
+        de la línea regular entre Torrijos y Toledo operada
+        por Autocares Hermanos Álvarez.
+      </p>
+
+      <div class="hero-actions">
+        <a class="primary-button" href="/horarios">
+          Consultar horarios
         </a>
       </div>
+
     </div>
 
-    <section class="card">
-      <h2>Recorrido Torrijos → Toledo</h2>
+  </section>
 
-      <ol class="route">
-        <li>Torrijos</li>
-        <li>Rielves — parada bajo demanda</li>
-        <li>Toledo Hospital Virgen de la Salud</li>
-        <li>Toledo Estación de Autobuses</li>
-        <li>Toledo Hospital Universitario</li>
-      </ol>
-    </section>
+  <section class="routes-section">
 
-    <section class="card">
-      <h2>Recorrido Toledo → Torrijos</h2>
+    <h2 class="section-title">
+      Recorrido de la línea VCM-618
+    </h2>
 
-      <ol class="route">
-        <li>Toledo Hospital Universitario</li>
-        <li>Toledo Estación de Autobuses</li>
-        <li>Toledo Hospital Virgen de la Salud</li>
-        <li>Rielves — parada bajo demanda</li>
-        <li>Torrijos</li>
-      </ol>
+    <p class="section-intro">
+      Consulta las paradas disponibles en ambos sentidos.
+    </p>
 
-      <div class="notice">
-        Los horarios pueden variar según el día del servicio.
-        Consulta siempre el buscador de horarios para obtener
-        la información actualizada.
-      </div>
-    </section>
-  </article>
+    <div class="route-grid">
+
+      <article class="route-card">
+
+        <h2>Torrijos → Toledo</h2>
+
+        <ol class="route-list">
+          <li>Torrijos</li>
+
+          <li>
+            Rielves
+            <span class="demand">
+              Bajo demanda
+            </span>
+          </li>
+
+          <li>
+            Toledo Hospital Virgen de la Salud
+          </li>
+
+          <li>
+            Toledo Estación de Autobuses
+          </li>
+
+          <li>
+            Toledo Hospital Universitario
+          </li>
+        </ol>
+
+      </article>
+
+      <article class="route-card">
+
+        <h2>Toledo → Torrijos</h2>
+
+        <ol class="route-list">
+
+          <li>
+            Toledo Hospital Universitario
+          </li>
+
+          <li>
+            Toledo Estación de Autobuses
+          </li>
+
+          <li>
+            Toledo Hospital Virgen de la Salud
+          </li>
+
+          <li>
+            Rielves
+            <span class="demand">
+              Bajo demanda
+            </span>
+          </li>
+
+          <li>Torrijos</li>
+
+        </ol>
+
+      </article>
+
+    </div>
+
+    <div class="info-card">
+      <strong>Información importante:</strong>
+      los horarios pueden variar según el día del servicio.
+      Utiliza siempre nuestro buscador para consultar
+      la información actualizada.
+    </div>
+
+  </section>
+
 </main>
 
-<footer>
-  Autocares Hermanos Álvarez ·
-  <a href="/">Web oficial</a>
+<footer class="site-footer">
+
+  <div class="footer-shell">
+
+    <div class="footer-grid">
+
+      <section class="footer-brand">
+
+        <img
+          class="footer-logo"
+          src="/assets/assets/images/logo.png"
+          alt="Autocares Hermanos Álvarez"
+        >
+
+        <h2>Autocares Hermanos Álvarez</h2>
+
+        <p>
+          Transporte de viajeros con experiencia,
+          cercanía y compromiso.
+        </p>
+
+      </section>
+
+      <section>
+
+        <div class="footer-title">
+          CONTACTA CON NOSOTROS
+        </div>
+
+        <div class="footer-contact">
+
+          <a href="tel:+34925760263">
+            ☎ 925 760 263
+          </a>
+
+          <a href="mailto:f.alvarez61@hotmail.com">
+            ✉ f.alvarez61@hotmail.com
+          </a>
+
+          <a
+            href="https://www.google.com/maps/search/?api=1&query=Avenida+Pilar+24+45500+Torrijos+Toledo"
+          >
+            Avenida Pilar, 24 – bajos<br>
+            45500 Torrijos, Toledo
+          </a>
+
+        </div>
+
+      </section>
+
+      <section>
+
+        <div class="footer-title">
+          INFORMACIÓN
+        </div>
+
+        <div class="footer-links">
+          <a href="/aviso-legal">Aviso Legal</a>
+          <a href="/privacidad">Política de Privacidad</a>
+          <a href="/cookies">Política de Cookies</a>
+        </div>
+
+      </section>
+
+    </div>
+
+    <div class="footer-bottom">
+      © Autocares Hermanos Álvarez
+    </div>
+
+  </div>
+
 </footer>
+
 </body>
 </html>
