@@ -19,19 +19,98 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+<meta
+  name="description"
+  content="Autocares Hermanos Álvarez. Consulta horarios y servicios de transporte de viajeros y solicita presupuesto para servicios discrecionales."
+>
 
-  <!-- iOS meta tags & icons -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="hermanosalvarez_app">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+<meta name="theme-color" content="#123F86">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Autocares Hermanos Álvarez">
+<meta property="og:title" content="Autocares Hermanos Álvarez">
+<meta
+  property="og:description"
+  content="Consulta horarios y servicios de transporte de viajeros y solicita presupuesto para servicios discrecionales."
+>
+<meta property="og:url" content="https://www.autocaresalvarezhnos.es/">
+<meta
+  property="og:image"
+  content="https://www.autocaresalvarezhnos.es/assets/assets/images/hero_bus.png"
+>
 
-  <title>hermanosalvarez_app</title>
-  <link rel="manifest" href="manifest.json">
+<!-- Twitter / redes sociales -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Autocares Hermanos Álvarez">
+<meta
+  name="twitter:description"
+  content="Consulta horarios y servicios de transporte de viajeros y solicita presupuesto para servicios discrecionales."
+>
+<meta
+  name="twitter:image"
+  content="https://www.autocaresalvarezhnos.es/assets/assets/images/hero_bus.png"
+>
+
+<!-- iOS / PWA -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta
+  name="apple-mobile-web-app-title"
+  content="Autocares Hermanos Álvarez"
+>
+<link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="favicon.png">
+
+<title>Autocares Hermanos Álvarez | Horarios y transporte de viajeros</title>
+<title>Autocares Hermanos Álvarez | Horarios y transporte de viajeros</title>
+
+<script>
+  (() => {
+    const canonicalPaths = {
+      '/': '/',
+      '/horarios': '/horarios',
+      '/servicios-discrecionales': '/servicios-discrecionales',
+
+      // Estas rutas muestran secciones de la página principal.
+      '/que-ofrecemos': '/',
+      '/contacto': '/',
+
+      // Páginas legales.
+      '/aviso-legal': '/aviso-legal',
+      '/privacidad': '/privacidad',
+      '/cookies': '/cookies'
+    };
+
+    const currentPath =
+      window.location.pathname.replace(/\/+$/, '') || '/';
+
+    const canonicalPath =
+      canonicalPaths[currentPath] ?? '/';
+
+    const canonicalUrl =
+      `https://www.autocaresalvarezhnos.es${canonicalPath}`;
+
+    const canonical = document.createElement('link');
+    canonical.rel = 'canonical';
+    canonical.href = canonicalUrl;
+    document.head.appendChild(canonical);
+
+    const ogUrl = document.querySelector(
+      'meta[property="og:url"]'
+    );
+
+    if (ogUrl) {
+      ogUrl.setAttribute('content', canonicalUrl);
+    }
+  })();
+</script>
+
+<link rel="manifest" href="manifest.json">
+
+<link rel="manifest" href="manifest.json">
 </head>
 <body>
   <!--
