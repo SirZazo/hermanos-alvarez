@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class TurnstileException implements Exception {
   final String message;
 
@@ -15,7 +17,7 @@ class TurnstileService {
 
   bool get configurado => _siteKey.isNotEmpty;
 
-  Future<String?> obtenerToken() async {
+  Future<String?> obtenerToken(BuildContext context) async {
     if (!configurado) {
       return null;
     }

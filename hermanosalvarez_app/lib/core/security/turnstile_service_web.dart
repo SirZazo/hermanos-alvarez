@@ -1,5 +1,7 @@
 import 'dart:js_interop';
 
+import 'package:flutter/material.dart';
+
 @JS('getTurnstileToken')
 external JSPromise<JSString> _getTurnstileToken(String siteKey);
 
@@ -20,7 +22,7 @@ class TurnstileService {
 
   bool get configurado => _siteKey.isNotEmpty;
 
-  Future<String?> obtenerToken() async {
+  Future<String?> obtenerToken(BuildContext context) async {
     if (!configurado) {
       return null;
     }
