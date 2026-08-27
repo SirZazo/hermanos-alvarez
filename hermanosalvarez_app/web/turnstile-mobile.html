@@ -113,11 +113,13 @@
                 enviarFlutter('token', token);
               },
 
-              'error-callback': function() {
+              'error-callback': function(errorCode) {
                 enviarFlutter(
                   'error',
-                  'Cloudflare no ha podido verificar la solicitud.'
+                  errorCode || 'desconocido'
                 );
+
+                return true;
               },
 
               'expired-callback': function() {
@@ -132,15 +134,30 @@
                   'error',
                   'La verificación ha agotado el tiempo.'
                 );
+              },
+
+              'unsupported-callback': function() {
+                enviarFlutter(
+                  'error',
+                  'WebView no compatible con Turnstile.'
+                );
               }
             }
           );
 
           window.turnstile.execute(widgetId);
-        } catch (_) {
+        } catch (error) {
+          let detalle = 'Error desconocido';
+
+          if (error && error.message) {
+            detalle = error.message;
+          } else {
+            detalle = String(error);
+          }
+
           enviarFlutter(
             'error',
-            'No se ha podido iniciar la verificación.'
+            'Inicialización: ' + detalle
           );
         }
       }
