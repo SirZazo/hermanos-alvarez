@@ -2,6 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
+      "source": "/servicios-discrecionales",
+      "destination": "/seo/servicios-discrecionales.html"
+    },
+    {
       "source": "/horarios/vcm-618-torrijos-toledo",
       "destination": "/seo/vcm-618-torrijos-toledo.html"
     },
@@ -12,6 +16,17 @@
     {
       "source": "/(.*)",
       "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/servicios-discrecionales/solicitar-presupuesto",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, follow"
+        }
+      ]
     }
   ]
 }
