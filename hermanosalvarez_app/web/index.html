@@ -68,34 +68,104 @@
 
 <script>
   (() => {
-    const canonicalPaths = {
-      '/': '/',
-      '/horarios': '/horarios',
-      '/servicios-discrecionales': '/servicios-discrecionales',
+    const seoPages = {
+      '/': {
+        canonical: '/',
+        title:
+          'Autocares Hermanos Álvarez | Horarios y transporte de viajeros',
+        description:
+          'Autocares Hermanos Álvarez. Consulta horarios y servicios de transporte de viajeros y solicita presupuesto para servicios discrecionales.'
+      },
+
+      '/horarios': {
+        canonical: '/horarios',
+        title:
+          'Horarios de autobuses | Autocares Hermanos Álvarez',
+        description:
+          'Consulta los horarios, líneas regulares, recorridos y paradas de Autocares Hermanos Álvarez.'
+      },
+
+      '/horarios/vcm-618-torrijos-toledo': {
+        canonical: '/horarios/vcm-618-torrijos-toledo',
+        title:
+          'Autobús Torrijos–Toledo: horarios VCM-618 | Hnos. Álvarez',
+        description:
+          'Consulta el recorrido, paradas y horarios de la línea regular VCM-618 entre Torrijos y Toledo de Autocares Hermanos Álvarez.'
+      },
+
+      '/horarios/vcm-042-almorox-torrijos': {
+        canonical: '/horarios/vcm-042-almorox-torrijos',
+        title:
+          'Autobús Almorox–Torrijos: horarios VCM-042 | Hnos. Álvarez',
+        description:
+          'Consulta recorridos, paradas y horarios de la línea VCM-042 entre Almorox, Escalona, Torrijos y otras localidades.'
+      },
+
+      '/servicios-discrecionales': {
+        canonical: '/servicios-discrecionales'
+      },
 
       // Estas rutas muestran secciones de la página principal.
-      '/que-ofrecemos': '/',
-      '/contacto': '/',
+      '/que-ofrecemos': {
+        canonical: '/'
+      },
+      '/contacto': {
+        canonical: '/'
+      },
 
       // Páginas legales.
-      '/aviso-legal': '/aviso-legal',
-      '/privacidad': '/privacidad',
-      '/cookies': '/cookies'
+      '/aviso-legal': {
+        canonical: '/aviso-legal'
+      },
+      '/privacidad': {
+        canonical: '/privacidad'
+      },
+      '/cookies': {
+        canonical: '/cookies'
+      }
     };
 
     const currentPath =
       window.location.pathname.replace(/\/+$/, '') || '/';
 
-    const canonicalPath =
-      canonicalPaths[currentPath] ?? '/';
+    const seo =
+      seoPages[currentPath] ?? seoPages['/'];
 
     const canonicalUrl =
-      `https://www.autocaresalvarezhnos.es${canonicalPath}`;
+      `https://www.autocaresalvarezhnos.es${seo.canonical}`;
 
     const canonical = document.createElement('link');
     canonical.rel = 'canonical';
     canonical.href = canonicalUrl;
     document.head.appendChild(canonical);
+
+    if (seo.title) {
+      document.title = seo.title;
+    }
+
+    const description = document.querySelector(
+      'meta[name="description"]'
+    );
+
+    if (description && seo.description) {
+      description.setAttribute('content', seo.description);
+    }
+
+    const ogTitle = document.querySelector(
+      'meta[property="og:title"]'
+    );
+
+    if (ogTitle && seo.title) {
+      ogTitle.setAttribute('content', seo.title);
+    }
+
+    const ogDescription = document.querySelector(
+      'meta[property="og:description"]'
+    );
+
+    if (ogDescription && seo.description) {
+      ogDescription.setAttribute('content', seo.description);
+    }
 
     const ogUrl = document.querySelector(
       'meta[property="og:url"]'
@@ -103,6 +173,22 @@
 
     if (ogUrl) {
       ogUrl.setAttribute('content', canonicalUrl);
+    }
+
+    const twitterTitle = document.querySelector(
+      'meta[name="twitter:title"]'
+    );
+
+    if (twitterTitle && seo.title) {
+      twitterTitle.setAttribute('content', seo.title);
+    }
+
+    const twitterDescription = document.querySelector(
+      'meta[name="twitter:description"]'
+    );
+
+    if (twitterDescription && seo.description) {
+      twitterDescription.setAttribute('content', seo.description);
     }
   })();
 </script>
