@@ -22,3 +22,5 @@ hermanosalvarez_back/data/lineas_backup_*.json
 
 # SEO web
 !hermanosalvarez_app/web/robots.txt
+.vercel
+.env*
