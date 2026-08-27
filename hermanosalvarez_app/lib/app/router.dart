@@ -15,7 +15,8 @@ class AppRouter {
   static const String avisoLegal = '/aviso-legal';
   static const String privacidad = '/privacidad';
   static const String cookies = '/cookies';
-  static const String serviciosDiscrecionales = '/servicios-discrecionales';
+  static const String serviciosDiscrecionales =
+      '/servicios-discrecionales/solicitar-presupuesto';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -70,11 +71,11 @@ class AppRouter {
           settings: settings,
         );
 
-        case serviciosDiscrecionales:
-          return MaterialPageRoute(
-            builder: (_) => const ServiciosDiscrecionalesPage(),
-            settings: settings,
-          );
+      case serviciosDiscrecionales:
+        return MaterialPageRoute(
+          builder: (_) => const ServiciosDiscrecionalesPage(),
+          settings: settings,
+        );
 
       default:
         return MaterialPageRoute(
