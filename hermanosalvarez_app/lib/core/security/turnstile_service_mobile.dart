@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -104,24 +105,34 @@ class _TurnstileDialogState extends State<_TurnstileDialog> {
   void _procesarMensaje(
     JavaScriptMessage message,
   ) {
-    final texto = message.message;
+    try {
+      final data = jsonDecode(message.message);
 
-    if (texto.contains('"type":"token"')) {
-      final inicio = texto.indexOf('"value":"') + 9;
-      final fin = texto.lastIndexOf('"');
+      if (data is! Map<String, dynamic>) {
+        throw const FormatException();
+      }
 
-      if (inicio >= 9 && fin > inicio) {
-        final token = texto.substring(inicio, fin);
+      final type = data['type']?.toString();
+      final value = data['value']?.toString() ?? '';
 
+      if (type == 'token' && value.trim().isNotEmpty) {
         if (mounted) {
-          Navigator.of(context).pop(token);
+          Navigator.of(context).pop(value.trim());
         }
 
         return;
       }
-    }
 
-    if (texto.contains('"type":"error"')) {
+      if (type == 'error') {
+        if (!mounted) {
+          return;
+        }
+
+        setState(() {
+          _error = 'Error Turnstile: $value';
+        });
+      }
+    } catch (_) {
       if (!mounted) {
         return;
       }
