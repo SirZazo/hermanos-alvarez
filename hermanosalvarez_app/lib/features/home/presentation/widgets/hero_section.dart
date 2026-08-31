@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+
 import '../../../../app/router.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class HeroSection extends StatelessWidget {
   const HeroSection({super.key});
@@ -25,10 +26,13 @@ class HeroSection extends StatelessWidget {
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: const Color(0xFF001C3A).withValues(alpha: 0.55),
+                color: const Color(0xFF001C3A).withValues(
+                  alpha: 0.55,
+                ),
               ),
             ),
           ),
+
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
@@ -36,25 +40,41 @@ class HeroSection extends StatelessWidget {
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                   colors: [
-                    const Color(0xFF00142D).withValues(alpha: 0.55),
-                    const Color(0xFF00142D).withValues(alpha: 0.25),
-                    const Color(0xFF00142D).withValues(alpha: 0.10),
+                    const Color(0xFF00142D).withValues(
+                      alpha: 0.55,
+                    ),
+                    const Color(0xFF00142D).withValues(
+                      alpha: 0.25,
+                    ),
+                    const Color(0xFF00142D).withValues(
+                      alpha: 0.10,
+                    ),
                   ],
                 ),
               ),
             ),
           ),
+
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24,
+              vertical: 48,
+            ),
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1100),
+                constraints: const BoxConstraints(
+                  maxWidth: 1100,
+                ),
                 child: isMobile
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _HeroContent(textTheme: textTheme),
+                          _HeroContent(
+                            textTheme: textTheme,
+                          ),
+
                           const SizedBox(height: 24),
+
                           const _HeroCard(),
                         ],
                       )
@@ -63,9 +83,13 @@ class HeroSection extends StatelessWidget {
                         children: [
                           Expanded(
                             flex: 13,
-                            child: _HeroContent(textTheme: textTheme),
+                            child: _HeroContent(
+                              textTheme: textTheme,
+                            ),
                           ),
+
                           const SizedBox(width: 32),
+
                           const Expanded(
                             flex: 8,
                             child: Align(
@@ -84,15 +108,23 @@ class HeroSection extends StatelessWidget {
   }
 }
 
+// -----------------------------------------------------------------------------
+// CONTENIDO PRINCIPAL
+// -----------------------------------------------------------------------------
+
 class _HeroContent extends StatelessWidget {
   final TextTheme textTheme;
 
-  const _HeroContent({required this.textTheme});
+  const _HeroContent({
+    required this.textTheme,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
+      padding: const EdgeInsets.symmetric(
+        vertical: 24,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -104,7 +136,9 @@ class _HeroContent extends StatelessWidget {
               letterSpacing: 1.3,
             ),
           ),
+
           const SizedBox(height: 16),
+
           Text(
             'Movemos personas con seguridad, cercanía y experiencia',
             style: textTheme.headlineLarge?.copyWith(
@@ -113,17 +147,27 @@ class _HeroContent extends StatelessWidget {
               height: 1.03,
             ),
           ),
+
           const SizedBox(height: 16),
+
           ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 640),
+            constraints: const BoxConstraints(
+              maxWidth: 640,
+            ),
             child: Text(
-              'Más de 40 años ofreciendo transporte público y servicios discrecionales con profesionalidad, puntualidad y atención personalizada.',
+              'Más de 40 años ofreciendo transporte público y servicios '
+              'discrecionales con profesionalidad, puntualidad y atención '
+              'personalizada.',
               style: textTheme.bodyLarge?.copyWith(
-                color: Colors.white.withValues(alpha: 0.92),
+                color: Colors.white.withValues(
+                  alpha: 0.92,
+                ),
               ),
             ),
           ),
+
           const SizedBox(height: 28),
+
           Wrap(
             spacing: 16,
             runSpacing: 16,
@@ -135,25 +179,41 @@ class _HeroContent extends StatelessWidget {
                     AppRouter.serviciosDiscrecionales,
                   );
                 },
-                child: const Text('Pedir presupuesto'),
+                child: const Text(
+                  'Pedir presupuesto',
+                ),
               ),
+
               OutlinedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, AppRouter.horarios);
+                  Navigator.pushNamed(
+                    context,
+                    AppRouter.horarios,
+                  );
                 },
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
-                  side: BorderSide(color: Colors.white.withValues(alpha: 0.35)),
-                  backgroundColor: Colors.white.withValues(alpha: 0.16),
+                  side: BorderSide(
+                    color: Colors.white.withValues(
+                      alpha: 0.35,
+                    ),
+                  ),
+                  backgroundColor: Colors.white.withValues(
+                    alpha: 0.16,
+                  ),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
                     vertical: 18,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(
+                      999,
+                    ),
                   ),
                 ),
-                child: const Text('Consultar horarios'),
+                child: const Text(
+                  'Consultar horarios',
+                ),
               ),
             ],
           ),
@@ -163,77 +223,167 @@ class _HeroContent extends StatelessWidget {
   }
 }
 
+// -----------------------------------------------------------------------------
+// TARJETA DE COMPROMISO
+// -----------------------------------------------------------------------------
+
 class _HeroCard extends StatelessWidget {
   const _HeroCard();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(maxWidth: 380),
-      padding: const EdgeInsets.all(32),
+      constraints: const BoxConstraints(
+        maxWidth: 380,
+      ),
+      padding: const EdgeInsets.fromLTRB(
+        28,
+        28,
+        28,
+        26,
+      ),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.95),
-        borderRadius: BorderRadius.circular(24),
+        color: Colors.white.withValues(
+          alpha: 0.95,
+        ),
+        borderRadius: BorderRadius.circular(
+          24,
+        ),
         boxShadow: const [
           BoxShadow(
             blurRadius: 30,
             offset: Offset(0, 12),
-            color: Color.fromRGBO(32, 60, 49, 0.10),
+            color: Color.fromRGBO(
+              32,
+              60,
+              49,
+              0.10,
+            ),
           ),
         ],
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Compromiso en cada trayecto',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w700,
-            ),
+          _HeroCardTitle(),
+
+          SizedBox(height: 22),
+
+          _HeroPoint(
+            icon: Icons.history_rounded,
+            text: 'Más de 40 años de experiencia',
           ),
-          const SizedBox(height: 16),
-          const _HeroPoint(text: 'Más de 40 años de experiencia'),
-          const SizedBox(height: 14),
-          const _HeroPoint(text: 'Servicio seguro y profesional'),
-          const SizedBox(height: 14),
-          const _HeroPoint(text: 'Atención cercana y personalizada'),
-          const SizedBox(height: 14),
-          const _HeroPoint(text: 'Transporte público y discrecional'),
+
+          SizedBox(height: 15),
+
+          _HeroPoint(
+            icon: Icons.shield_outlined,
+            text: 'Servicio seguro y profesional',
+          ),
+
+          SizedBox(height: 15),
+
+          _HeroPoint(
+            icon: Icons.handshake_outlined,
+            text: 'Atención cercana y personalizada',
+          ),
+
+          SizedBox(height: 15),
+
+          _HeroPoint(
+            icon: Icons.directions_bus_outlined,
+            text: 'Transporte público y discrecional',
+          ),
         ],
       ),
     );
   }
 }
 
-class _HeroPoint extends StatelessWidget {
-  final String text;
-
-  const _HeroPoint({required this.text});
+class _HeroCardTitle extends StatelessWidget {
+  const _HeroCardTitle();
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 2),
-          child: Text(
-            '•',
-            style: TextStyle(
-              color: AppColors.accent,
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
+        Container(
+          width: 4,
+          height: 28,
+          decoration: BoxDecoration(
+            color: AppColors.heritageAccent,
+            borderRadius: BorderRadius.circular(
+              999,
             ),
           ),
         ),
-        const SizedBox(width: 10),
+
+        const SizedBox(width: 12),
+
+        Expanded(
+          child: Text(
+            'Compromiso en cada trayecto',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: AppColors.heritageGreenDark,
+                  fontWeight: FontWeight.w800,
+                  height: 1.1,
+                ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// ELEMENTOS DE COMPROMISO
+// -----------------------------------------------------------------------------
+
+class _HeroPoint extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _HeroPoint({
+    required this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: AppColors.heritageAccent.withValues(
+              alpha: 0.18,
+            ),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.heritageAccent.withValues(
+                alpha: 0.42,
+              ),
+            ),
+          ),
+          child: Icon(
+            icon,
+            size: 20,
+            color: AppColors.heritageGreen,
+          ),
+        ),
+
+        const SizedBox(width: 14),
+
         Expanded(
           child: Text(
             text,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: AppColors.textPrimary),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w500,
+                  height: 1.3,
+                ),
           ),
         ),
       ],

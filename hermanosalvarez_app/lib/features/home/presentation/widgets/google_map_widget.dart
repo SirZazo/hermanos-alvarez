@@ -11,20 +11,17 @@ class GoogleMapWidget extends StatelessWidget {
   void _registerViewFactory() {
     if (_isRegistered) return;
 
-    ui_web.platformViewRegistry.registerViewFactory(
-      _viewType,
-      (int viewId) {
-        final iframe = html.IFrameElement()
-          ..src =
-              'https://www.google.com/maps?q=Avenida%20Pilar%2024%20Torrijos&output=embed'
-          ..style.border = '0'
-          ..style.width = '100%'
-          ..style.height = '100%'
-          ..allowFullscreen = true;
+    ui_web.platformViewRegistry.registerViewFactory(_viewType, (int viewId) {
+      final iframe = html.IFrameElement()
+        ..src =
+            'https://www.google.com/maps?q=Avenida%20Pilar%2024%20Torrijos&output=embed'
+        ..style.border = '0'
+        ..style.width = '100%'
+        ..style.height = '100%'
+        ..allowFullscreen = true;
 
-        return iframe;
-      },
-    );
+      return iframe;
+    });
 
     _isRegistered = true;
   }

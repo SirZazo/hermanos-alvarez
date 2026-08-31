@@ -1,11 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_decorations.dart';
 import '../../../shared/widgets/app_shell.dart';
+import '../../home/presentation/widgets/footer.dart';
 import '../data/api_service.dart';
-import 'package:flutter/foundation.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class HorariosPage extends StatefulWidget {
   const HorariosPage({super.key});
@@ -31,17 +31,27 @@ class _HorariosPageState extends State<HorariosPage> {
   List<Map<String, dynamic>> destinosDisponibles = [];
   List<Map<String, dynamic>> resultadosHorarios = [];
 
+  // ---------------------------------------------------------------------------
+  // CICLO DE VIDA
+  // ---------------------------------------------------------------------------
+
   @override
   void initState() {
     super.initState();
     _loadParadas();
   }
 
+  // ---------------------------------------------------------------------------
+  // API
+  // ---------------------------------------------------------------------------
+
   Future<void> _loadParadas() async {
     try {
       final loadedStops = await _apiService.getParadas(dia: diaSeleccionado);
 
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       setState(() {
         stops = loadedStops;
@@ -49,7 +59,9 @@ class _HorariosPageState extends State<HorariosPage> {
         error = null;
       });
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       setState(() {
         stops = [];
@@ -75,7 +87,9 @@ class _HorariosPageState extends State<HorariosPage> {
         dia: diaSeleccionado,
       );
 
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       setState(() {
         destinosDisponibles = destinos;
@@ -83,7 +97,9 @@ class _HorariosPageState extends State<HorariosPage> {
         error = null;
       });
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       setState(() {
         error = e.toString();
@@ -96,9 +112,53 @@ class _HorariosPageState extends State<HorariosPage> {
     }
   }
 
+  Future<void> _buscarHorarios() async {
+    if (origenSeleccionado == null || destinoSeleccionado == null) {
+      return;
+    }
+
+    try {
+      final resultado = await _apiService.getHorarios(
+        origen: origenSeleccionado!,
+        destino: destinoSeleccionado!,
+        dia: diaSeleccionado,
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        resultadosHorarios = List<Map<String, dynamic>>.from(
+          resultado['horarios'] ?? [],
+        );
+        busquedaRealizada = true;
+        error = null;
+      });
+
+      _scrollToResults();
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        error = e.toString();
+        resultadosHorarios = [];
+        busquedaRealizada = true;
+      });
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // SCROLL
+  // ---------------------------------------------------------------------------
+
   void _scrollToResults() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       final resultsContext = _resultsKey.currentContext;
 
@@ -113,46 +173,22 @@ class _HorariosPageState extends State<HorariosPage> {
     });
   }
 
-  Future<void> _buscarHorarios() async {
-    if (origenSeleccionado == null || destinoSeleccionado == null) return;
-
-    try {
-      final resultado = await _apiService.getHorarios(
-        origen: origenSeleccionado!,
-        destino: destinoSeleccionado!,
-        dia: diaSeleccionado,
-      );
-
-      if (!mounted) return;
-
-      setState(() {
-        resultadosHorarios = List<Map<String, dynamic>>.from(
-          resultado['horarios'] ?? [],
-        );
-        busquedaRealizada = true;
-        error = null;
-      });
-
-      _scrollToResults();
-    } catch (e) {
-      if (!mounted) return;
-
-      setState(() {
-        error = e.toString();
-        resultadosHorarios = [];
-        busquedaRealizada = true;
-      });
-    }
-  }
+  // ---------------------------------------------------------------------------
+  // INTERCAMBIAR ORIGEN / DESTINO
+  // ---------------------------------------------------------------------------
 
   void intercambiarOrigenDestino() {
-    if (origenSeleccionado == null || destinoSeleccionado == null) return;
+    if (origenSeleccionado == null || destinoSeleccionado == null) {
+      return;
+    }
 
     final destinoPuedeSerOrigen = stops.any(
       (stop) => stop['id'] == destinoSeleccionado,
     );
 
-    if (!destinoPuedeSerOrigen) return;
+    if (!destinoPuedeSerOrigen) {
+      return;
+    }
 
     final nuevoOrigen = destinoSeleccionado!;
     final nuevoDestino = origenSeleccionado!;
@@ -167,7 +203,9 @@ class _HorariosPageState extends State<HorariosPage> {
     });
 
     _cargarDestinosValidos(nuevoOrigen).then((_) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       final destinoExiste = destinosDisponibles.any(
         (stop) => stop['id'] == nuevoDestino,
@@ -181,116 +219,175 @@ class _HorariosPageState extends State<HorariosPage> {
     });
   }
 
+  // ---------------------------------------------------------------------------
+  // DECORACIONES
+  // ---------------------------------------------------------------------------
+
+  BoxDecoration _panelDecoration({double alpha = 0.88, double radius = 20}) {
+    return BoxDecoration(
+      color: AppColors.heritageSurface.withValues(alpha: alpha),
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(
+        color: AppColors.heritageGreenSoft.withValues(alpha: 0.25),
+      ),
+      boxShadow: const [
+        BoxShadow(
+          color: Color.fromRGBO(16, 58, 34, 0.10),
+          blurRadius: 24,
+          offset: Offset(0, 8),
+        ),
+      ],
+    );
+  }
+
   InputDecoration _inputDecoration({
     required String label,
     required IconData icon,
     required bool selected,
   }) {
-    final borderColor = selected ? AppColors.accentHover : AppColors.border;
+    final borderColor = selected
+        ? AppColors.heritageAccent
+        : AppColors.heritageGreenSoft.withValues(alpha: 0.30);
 
     return InputDecoration(
       labelText: label,
-
       labelStyle: TextStyle(
-        color: selected ? AppColors.primary : AppColors.textSecondary,
-        fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+        color: selected ? AppColors.heritageGreen : AppColors.textSecondary,
+        fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
       ),
-
       prefixIcon: Icon(
         icon,
-        color: selected ? AppColors.primary : AppColors.textMuted,
+        color: selected ? AppColors.heritageGreen : AppColors.heritageGreenSoft,
         size: 21,
       ),
-
       filled: true,
-
       fillColor: selected
-          ? const Color.fromRGBO(216, 233, 106, 0.08)
-          : AppColors.surfaceSoft,
-
+          ? AppColors.heritageAccent.withValues(alpha: 0.10)
+          : AppColors.heritageBackgroundSoft.withValues(alpha: 0.92),
       contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide(color: borderColor),
       ),
-
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide(color: borderColor, width: selected ? 1.4 : 1),
       ),
-
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppColors.primary, width: 1.7),
+        borderSide: const BorderSide(
+          color: AppColors.heritageGreen,
+          width: 1.7,
+        ),
       ),
-
       disabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppColors.border),
+        borderSide: BorderSide(
+          color: AppColors.heritageGreenSoft.withValues(alpha: 0.20),
+        ),
       ),
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // BUILD
+  // ---------------------------------------------------------------------------
+
   @override
   Widget build(BuildContext context) {
     return AppShell(
-      child: Container(
+      // -----------------------------------------------------------------------
+      // FONDO GLOBAL
+      // -----------------------------------------------------------------------
+
+      background: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/images/home_background.png',
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
+            filterQuality: FilterQuality.high,
+          ),
+
+          ColoredBox(
+            color: AppColors.heritageBackground.withValues(alpha: 0.28),
+          ),
+        ],
+      ),
+
+      // -----------------------------------------------------------------------
+      // CONTENIDO
+      // -----------------------------------------------------------------------
+      child: SizedBox(
         width: double.infinity,
-        color: AppColors.pageBackground,
         child: SingleChildScrollView(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1100),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 38, 24, 56),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeader(),
-                    const SizedBox(height: 28),
+          child: Column(
+            children: [
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1100),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 38, 24, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildHeader(),
 
-                    if (loading)
-                      _buildLoadingCard()
-                    else if (error != null && stops.isEmpty)
-                      _buildInitialError()
-                    else ...[
-                      _buildSearchCard(),
-                      if (kIsWeb) ...[
-                        const SizedBox(height: 24),
-                        _buildRegularLinesCard(),
-                      ],
+                        const SizedBox(height: 28),
 
-                      if (error != null && stops.isNotEmpty) ...[
-                        const SizedBox(height: 18),
-                        _buildErrorCard(),
-                      ],
+                        if (loading)
+                          _buildLoadingCard()
+                        else if (error != null && stops.isEmpty)
+                          _buildInitialError()
+                        else ...[
+                          _buildSearchCard(),
 
-                      if (busquedaRealizada) ...[
-                        const SizedBox(height: 24),
-                        _buildResultsCard(),
+                          if (kIsWeb) ...[
+                            const SizedBox(height: 24),
+                            _buildRegularLinesCard(),
+                          ],
+
+                          if (error != null && stops.isNotEmpty) ...[
+                            const SizedBox(height: 18),
+                            _buildErrorCard(),
+                          ],
+
+                          if (busquedaRealizada) ...[
+                            const SizedBox(height: 24),
+                            _buildResultsCard(),
+                          ],
+                        ],
                       ],
-                    ],
-                  ],
+                    ),
+                  ),
                 ),
               ),
-            ),
+
+              const FooterSection(),
+            ],
           ),
         ),
       ),
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // CABECERA
+  // ---------------------------------------------------------------------------
+
   Widget _buildHeader() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 26),
-      decoration: AppDecorations.softPanel(),
+      decoration: _panelDecoration(alpha: 0.86),
       child: const Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _HeaderIcon(),
+
           SizedBox(width: 18),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,13 +397,16 @@ class _HorariosPageState extends State<HorariosPage> {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.primaryDeep,
+                    color: AppColors.heritageGreenDark,
                     letterSpacing: -0.5,
                   ),
                 ),
+
                 SizedBox(height: 8),
+
                 Text(
-                  'Selecciona día, origen y destino para consultar las salidas disponibles.',
+                  'Selecciona día, origen y destino para consultar '
+                  'las salidas disponibles.',
                   style: TextStyle(
                     fontSize: 16,
                     height: 1.5,
@@ -321,29 +421,57 @@ class _HorariosPageState extends State<HorariosPage> {
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // BUSCADOR
+  // ---------------------------------------------------------------------------
+
   Widget _buildSearchCard() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(28),
-      decoration: AppDecorations.card(radius: 18),
+      decoration: _panelDecoration(alpha: 0.94),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Planifica tu viaje',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
-            ),
+          const Row(
+            children: [
+              _SectionIcon(icon: Icons.route_outlined),
+
+              SizedBox(width: 14),
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Planifica tu viaje',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.heritageGreenDark,
+                      ),
+                    ),
+
+                    SizedBox(height: 4),
+
+                    Text(
+                      'Indica desde dónde sales y hasta dónde quieres viajar.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 6),
-          const Text(
-            'Indica desde dónde sales y hasta dónde quieres viajar.',
-            style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
-          ),
+
           const SizedBox(height: 24),
 
+          // -------------------------------------------------------------------
+          // DÍA
+          // -------------------------------------------------------------------
           DropdownButtonFormField<String>(
             isExpanded: true,
             decoration: _inputDecoration(
@@ -361,7 +489,9 @@ class _HorariosPageState extends State<HorariosPage> {
               ),
             ],
             onChanged: (value) async {
-              if (value == null || value == diaSeleccionado) return;
+              if (value == null || value == diaSeleccionado) {
+                return;
+              }
 
               setState(() {
                 diaSeleccionado = value;
@@ -383,6 +513,9 @@ class _HorariosPageState extends State<HorariosPage> {
 
           const SizedBox(height: 24),
 
+          // -------------------------------------------------------------------
+          // ORIGEN
+          // -------------------------------------------------------------------
           DropdownButtonFormField<String>(
             isExpanded: true,
             decoration: _inputDecoration(
@@ -401,7 +534,9 @@ class _HorariosPageState extends State<HorariosPage> {
               );
             }).toList(),
             onChanged: (value) async {
-              if (value == null) return;
+              if (value == null) {
+                return;
+              }
 
               setState(() {
                 origenSeleccionado = value;
@@ -418,17 +553,22 @@ class _HorariosPageState extends State<HorariosPage> {
 
           const SizedBox(height: 12),
 
+          // -------------------------------------------------------------------
+          // INTERCAMBIAR
+          // -------------------------------------------------------------------
           Center(
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: AppColors.heritageSurface.withValues(alpha: 0.88),
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border),
+                border: Border.all(
+                  color: AppColors.heritageGreenSoft.withValues(alpha: 0.30),
+                ),
                 boxShadow: const [
                   BoxShadow(
-                    color: Color.fromRGBO(9, 37, 79, 0.05),
-                    blurRadius: 8,
-                    offset: Offset(0, 3),
+                    color: Color.fromRGBO(16, 58, 34, 0.08),
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
                   ),
                 ],
               ),
@@ -441,11 +581,13 @@ class _HorariosPageState extends State<HorariosPage> {
                     ? intercambiarOrigenDestino
                     : null,
                 icon: const Icon(Icons.swap_vert_rounded),
-                color: AppColors.primary,
+                color: AppColors.heritageGreen,
                 disabledColor: AppColors.textMuted,
-                hoverColor: AppColors.accentSoft,
-                highlightColor: AppColors.accentSoft,
-                splashColor: AppColors.accent,
+                hoverColor: AppColors.heritageAccent.withValues(alpha: 0.20),
+                highlightColor: AppColors.heritageAccent.withValues(
+                  alpha: 0.22,
+                ),
+                splashColor: AppColors.heritageAccent,
                 iconSize: 27,
                 tooltip: 'Intercambiar origen y destino',
               ),
@@ -454,6 +596,9 @@ class _HorariosPageState extends State<HorariosPage> {
 
           const SizedBox(height: 12),
 
+          // -------------------------------------------------------------------
+          // DESTINO
+          // -------------------------------------------------------------------
           DropdownButtonFormField<String>(
             isExpanded: true,
             decoration: _inputDecoration(
@@ -494,10 +639,12 @@ class _HorariosPageState extends State<HorariosPage> {
                         height: 18,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: AppColors.primary,
+                          color: AppColors.heritageGreen,
                         ),
                       ),
+
                       SizedBox(width: 12),
+
                       Text(
                         'Cargando destinos...',
                         style: TextStyle(color: AppColors.textSecondary),
@@ -509,6 +656,9 @@ class _HorariosPageState extends State<HorariosPage> {
 
           const SizedBox(height: 24),
 
+          // -------------------------------------------------------------------
+          // BUSCAR
+          // -------------------------------------------------------------------
           SizedBox(
             width: double.infinity,
             height: 54,
@@ -524,47 +674,16 @@ class _HorariosPageState extends State<HorariosPage> {
                 'Buscar horarios',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
               ),
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.resolveWith<Color?>((
-                  states,
-                ) {
-                  if (states.contains(WidgetState.disabled)) {
-                    return AppColors.border;
-                  }
-
-                  if (states.contains(WidgetState.hovered)) {
-                    return AppColors.primaryDark;
-                  }
-
-                  if (states.contains(WidgetState.pressed)) {
-                    return AppColors.primaryDeep;
-                  }
-
-                  return AppColors.primary;
-                }),
-                foregroundColor: WidgetStateProperty.resolveWith<Color?>((
-                  states,
-                ) {
-                  if (states.contains(WidgetState.disabled)) {
-                    return AppColors.textMuted;
-                  }
-
-                  return AppColors.white;
-                }),
-                overlayColor: WidgetStateProperty.all(
-                  const Color.fromRGBO(216, 233, 106, 0.10),
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                backgroundColor: AppColors.heritageGreen,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: AppColors.heritageGreenSoft.withValues(
+                  alpha: 0.22,
                 ),
-                elevation: WidgetStateProperty.resolveWith<double>((states) {
-                  if (states.contains(WidgetState.hovered)) {
-                    return 3;
-                  }
-
-                  return 0;
-                }),
-                shape: WidgetStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
+                disabledForegroundColor: AppColors.textMuted,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
                 ),
               ),
             ),
@@ -574,40 +693,52 @@ class _HorariosPageState extends State<HorariosPage> {
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // LÍNEAS REGULARES
+  // ---------------------------------------------------------------------------
+
   Widget _buildRegularLinesCard() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(28),
-      decoration: AppDecorations.card(radius: 18),
+      decoration: _panelDecoration(alpha: 0.94),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Row(
             children: [
-              Icon(Icons.route_outlined, color: AppColors.primary, size: 25),
-              SizedBox(width: 10),
+              _SectionIcon(icon: Icons.route_outlined),
+
+              SizedBox(width: 14),
+
               Expanded(
-                child: Text(
-                  'Líneas regulares',
-                  style: TextStyle(
-                    fontSize: 21,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Líneas regulares',
+                      style: TextStyle(
+                        fontSize: 21,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.heritageGreenDark,
+                      ),
+                    ),
+
+                    SizedBox(height: 4),
+
+                    Text(
+                      'Consulta información sobre recorridos, paradas '
+                      'y servicios de nuestras líneas regulares.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
-          ),
-
-          const SizedBox(height: 8),
-
-          const Text(
-            'Consulta información sobre recorridos, paradas y servicios de nuestras líneas regulares.',
-            style: TextStyle(
-              fontSize: 14,
-              height: 1.5,
-              color: AppColors.textSecondary,
-            ),
           ),
 
           const SizedBox(height: 24),
@@ -642,7 +773,9 @@ class _HorariosPageState extends State<HorariosPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(child: vcm618),
+
                   const SizedBox(width: 18),
+
                   Expanded(child: vcm042),
                 ],
               );
@@ -662,23 +795,25 @@ class _HorariosPageState extends State<HorariosPage> {
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSoft,
+        color: AppColors.heritageBackgroundSoft.withValues(alpha: 0.88),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(
+          color: AppColors.heritageGreenSoft.withValues(alpha: 0.24),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.accentSoft,
+              color: AppColors.heritageAccent.withValues(alpha: 0.28),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
               code,
               style: const TextStyle(
-                color: AppColors.primaryDeep,
+                color: AppColors.heritageGreenDark,
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.3,
@@ -691,7 +826,7 @@ class _HorariosPageState extends State<HorariosPage> {
           Text(
             title,
             style: const TextStyle(
-              color: AppColors.primaryDeep,
+              color: AppColors.heritageGreenDark,
               fontSize: 19,
               fontWeight: FontWeight.w800,
             ),
@@ -715,7 +850,7 @@ class _HorariosPageState extends State<HorariosPage> {
             icon: const Icon(Icons.arrow_forward_rounded, size: 19),
             label: const Text('Ver información de la línea'),
             style: TextButton.styleFrom(
-              foregroundColor: AppColors.primary,
+              foregroundColor: AppColors.heritageGreen,
               padding: EdgeInsets.zero,
               textStyle: const TextStyle(fontWeight: FontWeight.w700),
             ),
@@ -735,33 +870,36 @@ class _HorariosPageState extends State<HorariosPage> {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // RESULTADOS
+  // ---------------------------------------------------------------------------
+
   Widget _buildResultsCard() {
     return Container(
       key: _resultsKey,
       width: double.infinity,
       padding: const EdgeInsets.all(28),
-      decoration: AppDecorations.card(),
+      decoration: _panelDecoration(alpha: 0.94),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.directions_bus_outlined,
-                color: AppColors.primary,
-                size: 24,
-              ),
-              const SizedBox(width: 10),
+              const _SectionIcon(icon: Icons.directions_bus_outlined),
+
+              const SizedBox(width: 14),
+
               const Expanded(
                 child: Text(
                   'Horarios disponibles',
                   style: TextStyle(
                     fontSize: 21,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.heritageGreenDark,
                   ),
                 ),
               ),
+
               if (resultadosHorarios.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -769,21 +907,22 @@ class _HorariosPageState extends State<HorariosPage> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundSoft,
+                    color: AppColors.heritageAccent.withValues(alpha: 0.22),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     '${resultadosHorarios.length} '
                     '${resultadosHorarios.length == 1 ? 'servicio' : 'servicios'}',
                     style: const TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
+                      color: AppColors.heritageGreen,
+                      fontWeight: FontWeight.w700,
                       fontSize: 13,
                     ),
                   ),
                 ),
             ],
           ),
+
           const SizedBox(height: 20),
 
           if (resultadosHorarios.isEmpty)
@@ -791,9 +930,11 @@ class _HorariosPageState extends State<HorariosPage> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 26),
               decoration: BoxDecoration(
-                color: AppColors.surfaceSoft,
+                color: AppColors.heritageBackgroundSoft.withValues(alpha: 0.88),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(
+                  color: AppColors.heritageGreenSoft.withValues(alpha: 0.24),
+                ),
               ),
               child: const Column(
                 children: [
@@ -802,7 +943,9 @@ class _HorariosPageState extends State<HorariosPage> {
                     size: 34,
                     color: AppColors.textMuted,
                   ),
+
                   SizedBox(height: 10),
+
                   Text(
                     'No hay horarios disponibles',
                     style: TextStyle(
@@ -826,15 +969,21 @@ class _HorariosPageState extends State<HorariosPage> {
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // CARGANDO
+  // ---------------------------------------------------------------------------
+
   Widget _buildLoadingCard() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 70),
-      decoration: AppDecorations.card(),
+      decoration: _panelDecoration(alpha: 0.94),
       child: const Column(
         children: [
-          CircularProgressIndicator(color: AppColors.primary),
+          CircularProgressIndicator(color: AppColors.heritageGreen),
+
           SizedBox(height: 18),
+
           Text(
             'Cargando paradas...',
             style: TextStyle(
@@ -847,11 +996,15 @@ class _HorariosPageState extends State<HorariosPage> {
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // ERRORES
+  // ---------------------------------------------------------------------------
+
   Widget _buildInitialError() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      decoration: AppDecorations.card(radius: 18),
+      decoration: _panelDecoration(alpha: 0.94),
       child: Text(
         'No se han podido cargar las paradas.\n$error',
         style: const TextStyle(color: AppColors.textSecondary, height: 1.5),
@@ -871,7 +1024,9 @@ class _HorariosPageState extends State<HorariosPage> {
       child: Row(
         children: [
           const Icon(Icons.info_outline_rounded, color: Color(0xFF9A3412)),
+
           const SizedBox(width: 12),
+
           Expanded(
             child: Text(
               'No se ha podido completar la consulta: $error',
@@ -884,6 +1039,10 @@ class _HorariosPageState extends State<HorariosPage> {
   }
 }
 
+// =============================================================================
+// ICONO CABECERA
+// =============================================================================
+
 class _HeaderIcon extends StatelessWidget {
   const _HeaderIcon();
 
@@ -893,17 +1052,54 @@ class _HeaderIcon extends StatelessWidget {
       width: 52,
       height: 52,
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: AppColors.heritageGreen,
         borderRadius: BorderRadius.circular(15),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromRGBO(16, 58, 34, 0.15),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: const Icon(
         Icons.schedule_rounded,
-        color: AppColors.white,
+        color: AppColors.heritageAccent,
         size: 27,
       ),
     );
   }
 }
+
+// =============================================================================
+// ICONOS DE SECCIÓN
+// =============================================================================
+
+class _SectionIcon extends StatelessWidget {
+  final IconData icon;
+
+  const _SectionIcon({required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 42,
+      height: 42,
+      decoration: BoxDecoration(
+        color: AppColors.heritageAccent.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.heritageAccent.withValues(alpha: 0.42),
+        ),
+      ),
+      child: Icon(icon, color: AppColors.heritageGreen, size: 22),
+    );
+  }
+}
+
+// =============================================================================
+// RESULTADO INDIVIDUAL
+// =============================================================================
 
 class _ScheduleItem extends StatefulWidget {
   final String salida;
@@ -939,15 +1135,19 @@ class _ScheduleItemState extends State<_ScheduleItem> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         decoration: BoxDecoration(
-          color: _isHovered ? AppColors.white : AppColors.surfaceSoft,
+          color: _isHovered
+              ? AppColors.heritageSurface
+              : AppColors.heritageBackgroundSoft.withValues(alpha: 0.90),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: _isHovered ? AppColors.borderStrong : AppColors.border,
+            color: _isHovered
+                ? AppColors.heritageAccent
+                : AppColors.heritageGreenSoft.withValues(alpha: 0.24),
           ),
           boxShadow: _isHovered
               ? const [
                   BoxShadow(
-                    color: AppColors.shadowSoft,
+                    color: Color.fromRGBO(16, 58, 34, 0.12),
                     blurRadius: 14,
                     offset: Offset(0, 5),
                   ),
@@ -963,19 +1163,23 @@ class _ScheduleItemState extends State<_ScheduleItem> {
                 alignment: CrossAxisAlignment.start,
               ),
             ),
+
             AnimatedContainer(
               duration: const Duration(milliseconds: 180),
               padding: const EdgeInsets.all(9),
               decoration: BoxDecoration(
-                color: _isHovered ? AppColors.accent : AppColors.accentSoft,
+                color: _isHovered
+                    ? AppColors.heritageAccent
+                    : AppColors.heritageAccent.withValues(alpha: 0.24),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.arrow_forward_rounded,
-                color: AppColors.primaryDeep,
+                color: AppColors.heritageGreenDark,
                 size: 19,
               ),
             ),
+
             Expanded(
               child: _TimeBlock(
                 label: 'Llegada',
@@ -989,6 +1193,10 @@ class _ScheduleItemState extends State<_ScheduleItem> {
     );
   }
 }
+
+// =============================================================================
+// BLOQUES DE HORA
+// =============================================================================
 
 class _TimeBlock extends StatelessWidget {
   final String label;
@@ -1014,13 +1222,15 @@ class _TimeBlock extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
+
         const SizedBox(height: 3),
+
         Text(
           time,
           style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w800,
-            color: AppColors.primaryDeep,
+            color: AppColors.heritageGreenDark,
           ),
         ),
       ],

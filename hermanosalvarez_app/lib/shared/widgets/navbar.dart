@@ -27,7 +27,7 @@ class _DesktopNavbar extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: Colors.transparent,
-      padding: const EdgeInsets.fromLTRB(24, 14, 24, 14),
+      padding: const EdgeInsets.fromLTRB(24, 14, 24, 8),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1200),
@@ -189,6 +189,9 @@ class AppNavbarDrawer extends StatelessWidget {
 
               const SizedBox(height: 8),
 
+              // ----------------------------------------------------------------
+              // INICIO
+              // ----------------------------------------------------------------
               _DrawerItem(
                 label: 'Inicio',
                 isActive: currentRoute == AppRouter.home,
@@ -205,33 +208,27 @@ class AppNavbarDrawer extends StatelessWidget {
                 },
               ),
 
+              // ----------------------------------------------------------------
+              // SOLICITAR PRESUPUESTO
+              // ----------------------------------------------------------------
               _DrawerItem(
-                label: 'Qué ofrecemos',
-                isActive: currentRoute == AppRouter.queOfrecemos,
+                label: 'Solicitar Presupuesto',
+                isActive: currentRoute == AppRouter.serviciosDiscrecionales,
                 onTap: () {
                   Navigator.pop(context);
 
-                  if (currentRoute != AppRouter.queOfrecemos) {
+                  if (currentRoute != AppRouter.serviciosDiscrecionales) {
                     Navigator.pushReplacementNamed(
                       context,
-                      AppRouter.queOfrecemos,
+                      AppRouter.serviciosDiscrecionales,
                     );
                   }
                 },
               ),
 
-              _DrawerItem(
-                label: 'Contacto',
-                isActive: currentRoute == AppRouter.contacto,
-                onTap: () {
-                  Navigator.pop(context);
-
-                  if (currentRoute != AppRouter.contacto) {
-                    Navigator.pushReplacementNamed(context, AppRouter.contacto);
-                  }
-                },
-              ),
-
+              // ----------------------------------------------------------------
+              // HORARIOS
+              // ----------------------------------------------------------------
               _DrawerItem(
                 label: 'Horarios',
                 isActive: currentRoute == AppRouter.horarios,
@@ -315,7 +312,7 @@ class _BrandLogo extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// MENÚ
+// MENÚ DESKTOP
 // -----------------------------------------------------------------------------
 
 class _MenuSection extends StatelessWidget {
@@ -328,6 +325,10 @@ class _MenuSection extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // ---------------------------------------------------------------------
+        // INICIO
+        // ---------------------------------------------------------------------
+
         _NavItem(
           label: 'Inicio',
           isActive: currentRoute == AppRouter.home,
@@ -342,26 +343,25 @@ class _MenuSection extends StatelessWidget {
           },
         ),
 
+        // ---------------------------------------------------------------------
+        // SOLICITAR PRESUPUESTO
+        // ---------------------------------------------------------------------
         _NavItem(
-          label: 'Qué ofrecemos',
-          isActive: currentRoute == AppRouter.queOfrecemos,
+          label: 'Solicitar Presupuesto',
+          isActive: currentRoute == AppRouter.serviciosDiscrecionales,
           onTap: () {
-            if (currentRoute != AppRouter.queOfrecemos) {
-              Navigator.pushReplacementNamed(context, AppRouter.queOfrecemos);
+            if (currentRoute != AppRouter.serviciosDiscrecionales) {
+              Navigator.pushReplacementNamed(
+                context,
+                AppRouter.serviciosDiscrecionales,
+              );
             }
           },
         ),
 
-        _NavItem(
-          label: 'Contacto',
-          isActive: currentRoute == AppRouter.contacto,
-          onTap: () {
-            if (currentRoute != AppRouter.contacto) {
-              Navigator.pushReplacementNamed(context, AppRouter.contacto);
-            }
-          },
-        ),
-
+        // ---------------------------------------------------------------------
+        // HORARIOS
+        // ---------------------------------------------------------------------
         _NavItem(
           label: 'Horarios',
           isActive: currentRoute == AppRouter.horarios,
@@ -390,7 +390,9 @@ class _ContactSection extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _ContactItem(icon: Icons.phone, text: '925 760 263'),
+
         SizedBox(height: 6),
+
         _ContactItem(icon: Icons.email, text: 'f.alvarez61@hotmail.com'),
       ],
     );
@@ -477,11 +479,11 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 7),
       child: TextButton(
         onPressed: onTap,
         style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+          padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 11),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),

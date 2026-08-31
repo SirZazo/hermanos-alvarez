@@ -15,38 +15,92 @@ class AppRouter {
   static const String avisoLegal = '/aviso-legal';
   static const String privacidad = '/privacidad';
   static const String cookies = '/cookies';
+
   static const String serviciosDiscrecionales =
       '/servicios-discrecionales/solicitar-presupuesto';
 
-  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+  // ---------------------------------------------------------------------------
+  // TRANSICIÓN COMÚN
+  // ---------------------------------------------------------------------------
+
+  static Route<dynamic> _animatedRoute({
+    required Widget page,
+    required RouteSettings settings,
+  }) {
+    return PageRouteBuilder<dynamic>(
+      settings: settings,
+
+      transitionDuration: const Duration(
+        milliseconds: 220,
+      ),
+
+      reverseTransitionDuration: const Duration(
+        milliseconds: 180,
+      ),
+
+      pageBuilder: (
+        context,
+        animation,
+        secondaryAnimation,
+      ) {
+        return page;
+      },
+
+      transitionsBuilder: (
+        context,
+        animation,
+        secondaryAnimation,
+        child,
+      ) {
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+          reverseCurve: Curves.easeInCubic,
+        );
+
+        return FadeTransition(
+          opacity: curvedAnimation,
+          child: child,
+        );
+      },
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // RUTAS
+  // ---------------------------------------------------------------------------
+
+  static Route<dynamic> onGenerateRoute(
+    RouteSettings settings,
+  ) {
     switch (settings.name) {
       case home:
-        return MaterialPageRoute(
-          builder: (_) => const HomePage(),
+        return _animatedRoute(
+          page: const HomePage(),
           settings: settings,
         );
 
       case queOfrecemos:
-        return MaterialPageRoute(
-          builder: (_) => const HomePage(),
+        return _animatedRoute(
+          page: const HomePage(),
           settings: settings,
         );
 
       case horarios:
-        return MaterialPageRoute(
-          builder: (_) => const HorariosPage(),
+        return _animatedRoute(
+          page: const HorariosPage(),
           settings: settings,
         );
 
       case contacto:
-        return MaterialPageRoute(
-          builder: (_) => const HomePage(),
+        return _animatedRoute(
+          page: const HomePage(),
           settings: settings,
         );
 
       case avisoLegal:
-        return MaterialPageRoute(
-          builder: (_) => const LegalPage(
+        return _animatedRoute(
+          page: const LegalPage(
             title: 'Aviso Legal',
             markdown: LegalTexts.avisoLegal,
           ),
@@ -54,8 +108,8 @@ class AppRouter {
         );
 
       case privacidad:
-        return MaterialPageRoute(
-          builder: (_) => const LegalPage(
+        return _animatedRoute(
+          page: const LegalPage(
             title: 'Política de Privacidad',
             markdown: LegalTexts.privacidad,
           ),
@@ -63,8 +117,8 @@ class AppRouter {
         );
 
       case cookies:
-        return MaterialPageRoute(
-          builder: (_) => const LegalPage(
+        return _animatedRoute(
+          page: const LegalPage(
             title: 'Política de Cookies',
             markdown: LegalTexts.cookies,
           ),
@@ -72,14 +126,14 @@ class AppRouter {
         );
 
       case serviciosDiscrecionales:
-        return MaterialPageRoute(
-          builder: (_) => const ServiciosDiscrecionalesPage(),
+        return _animatedRoute(
+          page: const ServiciosDiscrecionalesPage(),
           settings: settings,
         );
 
       default:
-        return MaterialPageRoute(
-          builder: (_) => const HomePage(),
+        return _animatedRoute(
+          page: const HomePage(),
           settings: settings,
         );
     }
