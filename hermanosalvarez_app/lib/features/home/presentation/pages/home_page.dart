@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/router.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/app_shell.dart';
 import '../widgets/footer.dart';
 import '../widgets/home_carousel_section.dart';
@@ -98,16 +99,40 @@ class _HomePageState extends State<HomePage> {
     final initialCarouselPage = routeName == AppRouter.queOfrecemos ? 1 : 0;
 
     return AppShell(
+      // Fondo global de toda la Home:
+      // navbar + carrusel + footer.
+      background: Stack(
+        fit: StackFit.expand,
+        children: [
+          const ColoredBox(color: AppColors.heritageBackgroundSoft),
+
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Opacity(
+                opacity: 0.80,
+                child: Image.asset(
+                  'assets/images/home_background.png',
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+
       child: SingleChildScrollView(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1200),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  KeyedSubtree(
+        child: Column(
+          children: [
+            // ---------------------------------------------------------------
+            // CARRUSEL
+            // ---------------------------------------------------------------
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1200),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
+                  child: KeyedSubtree(
                     key: _homeKey,
                     child: KeyedSubtree(
                       key: _offersKey,
@@ -116,12 +141,19 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-
-                  KeyedSubtree(key: _contactKey, child: FooterSection()),
-                ],
+                ),
               ),
             ),
-          ),
+
+            // ---------------------------------------------------------------
+            // FOOTER
+            //
+            // Está FUERA del maxWidth del carrusel.
+            // Su caja principal controla su ancho internamente,
+            // mientras que la barra inferior puede ocupar toda la pantalla.
+            // ---------------------------------------------------------------
+            KeyedSubtree(key: _contactKey, child: const FooterSection()),
+          ],
         ),
       ),
     );

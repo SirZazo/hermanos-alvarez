@@ -9,31 +9,29 @@ class ValueSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.sizeOf(context).width < 800;
 
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 40),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1700),
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 430),
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/hero_bus.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Color.fromRGBO(12, 57, 110, 0.78),
-              ),
+    return SizedBox.expand(
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/hero_bus.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: DecoratedBox(
+          decoration: const BoxDecoration(
+            color: Color.fromRGBO(12, 57, 110, 0.78),
+          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1100),
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 24 : 90,
+                  horizontal: isMobile ? 24 : 70,
                   vertical: isMobile ? 40 : 55,
                 ),
                 child: isMobile
                     ? const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           _ValueSectionContent(isMobile: true),
@@ -42,17 +40,11 @@ class ValueSection extends StatelessWidget {
                         ],
                       )
                     : const Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Expanded(
-                            flex: 6,
-                            child: _ValueSectionContent(),
-                          ),
+                          Expanded(flex: 6, child: _ValueSectionContent()),
                           SizedBox(width: 80),
-                          Expanded(
-                            flex: 5,
-                            child: _ValueCardsColumn(),
-                          ),
+                          Expanded(flex: 5, child: _ValueCardsColumn()),
                         ],
                       ),
               ),
@@ -67,9 +59,7 @@ class ValueSection extends StatelessWidget {
 class _ValueSectionContent extends StatelessWidget {
   final bool isMobile;
 
-  const _ValueSectionContent({
-    this.isMobile = false,
-  });
+  const _ValueSectionContent({this.isMobile = false});
 
   @override
   Widget build(BuildContext context) {
@@ -177,25 +167,17 @@ class _ValueCard extends StatelessWidget {
   final String title;
   final String description;
 
-  const _ValueCard({
-    required this.title,
-    required this.description,
-  });
+  const _ValueCard({required this.title, required this.description});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 24,
-        vertical: 22,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
       decoration: BoxDecoration(
         color: const Color.fromRGBO(255, 255, 255, 0.10),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: const Color.fromRGBO(255, 255, 255, 0.18),
-        ),
+        border: Border.all(color: const Color.fromRGBO(255, 255, 255, 0.18)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

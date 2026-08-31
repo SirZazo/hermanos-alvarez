@@ -22,6 +22,8 @@ class _HomeCarouselSectionState extends State<HomeCarouselSection> {
   static const Duration _autoPlayDelay = Duration(seconds: 7);
   static const Duration _animationDuration = Duration(milliseconds: 650);
 
+  static const double _outerRadius = 22;
+
   late final PageController _pageController;
 
   Timer? _autoPlayTimer;
@@ -91,29 +93,47 @@ class _HomeCarouselSectionState extends State<HomeCarouselSection> {
     final screenWidth = MediaQuery.sizeOf(context).width;
 
     final carouselHeight = switch (screenWidth) {
-      < 600 => 1100.0,
-      < 900 => 900.0,
-      _ => 680.0,
+      < 600 => 780.0,
+      < 900 => 650.0,
+      _ => 500.0,
     };
 
     return SizedBox(
       width: double.infinity,
       height: carouselHeight,
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
           Positioned.fill(
-            child: ClipRect(
-              child: ScrollConfiguration(
-                behavior: const _CarouselScrollBehavior(),
-                child: PageView(
-                  controller: _pageController,
-                  onPageChanged: _onPageChanged,
-                  physics: const PageScrollPhysics(),
-                  children: const [
-                    HeroSection(),
-                    ValueSection(),
-                    AboutSection(),
-                  ],
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(_outerRadius),
+                border: Border.all(
+                  color: AppColors.heritageGreenSoft.withValues(alpha: 0.70),
+                  width: 1.2,
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color.fromRGBO(16, 58, 34, 0.10),
+                    blurRadius: 20,
+                    offset: Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(_outerRadius),
+                child: ScrollConfiguration(
+                  behavior: const _CarouselScrollBehavior(),
+                  child: PageView(
+                    controller: _pageController,
+                    onPageChanged: _onPageChanged,
+                    physics: const PageScrollPhysics(),
+                    children: const [
+                      HeroSection(),
+                      ValueSection(),
+                      AboutSection(),
+                    ],
+                  ),
                 ),
               ),
             ),

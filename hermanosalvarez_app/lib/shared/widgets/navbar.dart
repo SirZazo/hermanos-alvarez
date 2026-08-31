@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
+
 import '../../app/router.dart';
+import '../../core/theme/app_colors.dart';
 
 class AppNavbar extends StatelessWidget {
   const AppNavbar({super.key});
@@ -14,6 +15,10 @@ class AppNavbar extends StatelessWidget {
   }
 }
 
+// -----------------------------------------------------------------------------
+// DESKTOP
+// -----------------------------------------------------------------------------
+
 class _DesktopNavbar extends StatelessWidget {
   const _DesktopNavbar();
 
@@ -21,40 +26,43 @@ class _DesktopNavbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(24, 18, 24, 18),
-      decoration: const BoxDecoration(
-        color: AppColors.primary,
-      ),
+      color: Colors.transparent,
+      padding: const EdgeInsets.fromLTRB(24, 14, 24, 14),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1200),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
             decoration: BoxDecoration(
-              color: AppColors.navInnerBackground,
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.heritageGreen, AppColors.heritageGreenDark],
+              ),
               borderRadius: BorderRadius.circular(22),
               border: Border.all(
-                color: const Color.fromRGBO(255, 255, 255, 0.10),
+                color: AppColors.heritageGreenSoft.withValues(alpha: 0.70),
+                width: 1,
               ),
               boxShadow: const [
                 BoxShadow(
-                  color: Color.fromRGBO(0, 0, 0, 0.10),
-                  blurRadius: 22,
-                  offset: Offset(0, 8),
+                  color: Color.fromRGBO(16, 58, 34, 0.20),
+                  blurRadius: 24,
+                  offset: Offset(0, 9),
                 ),
               ],
             ),
-            child: Row(
+            child: const Row(
               children: [
-                const _BrandSection(),
-                const SizedBox(width: 24),
-                const Expanded(
-                  child: Center(
-                    child: _MenuSection(),
-                  ),
-                ),
-                const SizedBox(width: 24),
-                const _ContactSection(),
+                _BrandSection(),
+
+                SizedBox(width: 24),
+
+                Expanded(child: Center(child: _MenuSection())),
+
+                SizedBox(width: 24),
+
+                _ContactSection(),
               ],
             ),
           ),
@@ -64,6 +72,10 @@ class _DesktopNavbar extends StatelessWidget {
   }
 }
 
+// -----------------------------------------------------------------------------
+// MÓVIL
+// -----------------------------------------------------------------------------
+
 class _MobileNavbar extends StatelessWidget {
   const _MobileNavbar();
 
@@ -71,23 +83,25 @@ class _MobileNavbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-      decoration: const BoxDecoration(
-        color: AppColors.primary,
-      ),
+      color: Colors.transparent,
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
       child: SafeArea(
         bottom: false,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
           decoration: BoxDecoration(
-            color: AppColors.navInnerBackground,
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppColors.heritageGreen, AppColors.heritageGreenDark],
+            ),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: const Color.fromRGBO(255, 255, 255, 0.10),
+              color: AppColors.heritageGreenSoft.withValues(alpha: 0.70),
             ),
             boxShadow: const [
               BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.10),
+                color: Color.fromRGBO(16, 58, 34, 0.18),
                 blurRadius: 18,
                 offset: Offset(0, 6),
               ),
@@ -96,29 +110,29 @@ class _MobileNavbar extends StatelessWidget {
           child: Row(
             children: [
               const _BrandSectionMobile(),
+
               const SizedBox(width: 12),
-              Expanded(
+
+              const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    _MobileContactText(
-                      icon: Icons.phone,
-                      text: '925 760 263',
-                    ),
+                  children: [
+                    _MobileContactText(icon: Icons.phone, text: '925 760 263'),
                     SizedBox(height: 4),
-                    _MobileContactText(
-                      icon: Icons.email,
-                      text: 'Contacto',
-                    ),
+                    _MobileContactText(icon: Icons.email, text: 'Contacto'),
                   ],
                 ),
               ),
+
               const SizedBox(width: 8),
+
               Builder(
                 builder: (context) {
                   return IconButton(
-                    onPressed: () => Scaffold.of(context).openEndDrawer(),
+                    onPressed: () {
+                      Scaffold.of(context).openEndDrawer();
+                    },
                     icon: const Icon(
                       Icons.menu_rounded,
                       color: AppColors.navText,
@@ -136,6 +150,10 @@ class _MobileNavbar extends StatelessWidget {
   }
 }
 
+// -----------------------------------------------------------------------------
+// DRAWER MÓVIL
+// -----------------------------------------------------------------------------
+
 class AppNavbarDrawer extends StatelessWidget {
   const AppNavbarDrawer({super.key});
 
@@ -144,38 +162,33 @@ class AppNavbarDrawer extends StatelessWidget {
     final currentRoute = ModalRoute.of(context)?.settings.name;
 
     return Drawer(
+      backgroundColor: AppColors.heritageBackgroundSoft,
       child: SafeArea(
         child: Container(
-          color: AppColors.surface,
+          color: AppColors.heritageBackgroundSoft,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
                 decoration: const BoxDecoration(
-                  color: AppColors.primary,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.heritageGreen,
+                      AppColors.heritageGreenDark,
+                    ],
+                  ),
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        height: 44,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ],
+                child: const Row(
+                  children: [_BrandLogo(width: 210, borderRadius: 10)],
                 ),
               ),
+
+              const SizedBox(height: 8),
+
               _DrawerItem(
                 label: 'Inicio',
                 isActive: currentRoute == AppRouter.home,
@@ -191,6 +204,7 @@ class AppNavbarDrawer extends StatelessWidget {
                   }
                 },
               ),
+
               _DrawerItem(
                 label: 'Qué ofrecemos',
                 isActive: currentRoute == AppRouter.queOfrecemos,
@@ -205,6 +219,7 @@ class AppNavbarDrawer extends StatelessWidget {
                   }
                 },
               ),
+
               _DrawerItem(
                 label: 'Contacto',
                 isActive: currentRoute == AppRouter.contacto,
@@ -212,25 +227,25 @@ class AppNavbarDrawer extends StatelessWidget {
                   Navigator.pop(context);
 
                   if (currentRoute != AppRouter.contacto) {
-                    Navigator.pushReplacementNamed(
-                      context,
-                      AppRouter.contacto,
-                    );
+                    Navigator.pushReplacementNamed(context, AppRouter.contacto);
                   }
                 },
               ),
+
               _DrawerItem(
                 label: 'Horarios',
                 isActive: currentRoute == AppRouter.horarios,
                 onTap: () {
                   Navigator.pop(context);
+
                   if (currentRoute != AppRouter.horarios) {
                     Navigator.pushReplacementNamed(context, AppRouter.horarios);
                   }
                 },
               ),
 
-              const Divider(height: 28),
+              const Divider(height: 28, color: AppColors.heritageBorder),
+
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: _DrawerContactItem(
@@ -238,7 +253,9 @@ class AppNavbarDrawer extends StatelessWidget {
                   text: '925 760 263',
                 ),
               ),
+
               const SizedBox(height: 10),
+
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: _DrawerContactItem(
@@ -254,26 +271,16 @@ class AppNavbarDrawer extends StatelessWidget {
   }
 }
 
+// -----------------------------------------------------------------------------
+// LOGO
+// -----------------------------------------------------------------------------
+
 class _BrandSection extends StatelessWidget {
   const _BrandSection();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color.fromRGBO(215, 227, 219, 0.8),
-        ),
-      ),
-      child: Image.asset(
-        'assets/images/logo.png',
-        height: 64,
-        fit: BoxFit.contain,
-      ),
-    );
+    return const _BrandLogo(width: 225, borderRadius: 12);
   }
 }
 
@@ -282,23 +289,34 @@ class _BrandSectionMobile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color.fromRGBO(215, 227, 219, 0.8),
-        ),
-      ),
+    return const _BrandLogo(width: 145, borderRadius: 9);
+  }
+}
+
+class _BrandLogo extends StatelessWidget {
+  final double width;
+  final double borderRadius;
+
+  const _BrandLogo({required this.width, required this.borderRadius});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius),
       child: Image.asset(
-        'assets/images/logo.png',
-        height: 40,
-        fit: BoxFit.contain,
+        'assets/images/logo_footer.png',
+        width: width,
+        fit: BoxFit.fitWidth,
+        filterQuality: FilterQuality.high,
+        isAntiAlias: true,
       ),
     );
   }
 }
+
+// -----------------------------------------------------------------------------
+// MENÚ
+// -----------------------------------------------------------------------------
 
 class _MenuSection extends StatelessWidget {
   const _MenuSection();
@@ -323,30 +341,27 @@ class _MenuSection extends StatelessWidget {
             }
           },
         ),
+
         _NavItem(
           label: 'Qué ofrecemos',
           isActive: currentRoute == AppRouter.queOfrecemos,
           onTap: () {
             if (currentRoute != AppRouter.queOfrecemos) {
-              Navigator.pushReplacementNamed(
-                context,
-                AppRouter.queOfrecemos,
-              );
+              Navigator.pushReplacementNamed(context, AppRouter.queOfrecemos);
             }
           },
         ),
+
         _NavItem(
           label: 'Contacto',
           isActive: currentRoute == AppRouter.contacto,
           onTap: () {
             if (currentRoute != AppRouter.contacto) {
-              Navigator.pushReplacementNamed(
-                context,
-                AppRouter.contacto,
-              );
+              Navigator.pushReplacementNamed(context, AppRouter.contacto);
             }
           },
         ),
+
         _NavItem(
           label: 'Horarios',
           isActive: currentRoute == AppRouter.horarios,
@@ -356,30 +371,27 @@ class _MenuSection extends StatelessWidget {
             }
           },
         ),
-
       ],
     );
   }
 }
+
+// -----------------------------------------------------------------------------
+// CONTACTO DESKTOP
+// -----------------------------------------------------------------------------
 
 class _ContactSection extends StatelessWidget {
   const _ContactSection();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      children: const [
-        _ContactItem(
-          icon: Icons.phone,
-          text: '925 760 263',
-        ),
+      children: [
+        _ContactItem(icon: Icons.phone, text: '925 760 263'),
         SizedBox(height: 6),
-        _ContactItem(
-          icon: Icons.email,
-          text: 'f.alvarez61@hotmail.com',
-        ),
+        _ContactItem(icon: Icons.email, text: 'f.alvarez61@hotmail.com'),
       ],
     );
   }
@@ -389,21 +401,16 @@ class _ContactItem extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const _ContactItem({
-    required this.icon,
-    required this.text,
-  });
+  const _ContactItem({required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: AppColors.accent,
-        ),
+        Icon(icon, size: 18, color: AppColors.heritageAccent),
+
         const SizedBox(width: 8),
+
         Text(
           text,
           style: const TextStyle(
@@ -417,26 +424,25 @@ class _ContactItem extends StatelessWidget {
   }
 }
 
+// -----------------------------------------------------------------------------
+// CONTACTO MÓVIL
+// -----------------------------------------------------------------------------
+
 class _MobileContactText extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const _MobileContactText({
-    required this.icon,
-    required this.text,
-  });
+  const _MobileContactText({required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 14,
-          color: AppColors.accent,
-        ),
+        Icon(icon, size: 14, color: AppColors.heritageAccent),
+
         const SizedBox(width: 6),
+
         Flexible(
           child: Text(
             text,
@@ -453,6 +459,10 @@ class _MobileContactText extends StatelessWidget {
   }
 }
 
+// -----------------------------------------------------------------------------
+// BOTONES DEL NAVBAR
+// -----------------------------------------------------------------------------
+
 class _NavItem extends StatelessWidget {
   final String label;
   final bool isActive;
@@ -467,21 +477,26 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 5),
       child: TextButton(
         onPressed: onTap,
         style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
-          backgroundColor:
-              isActive ? AppColors.navActiveBackground : Colors.transparent,
+          backgroundColor: isActive
+              ? const Color.fromRGBO(216, 233, 106, 0.14)
+              : Colors.transparent,
+          foregroundColor: isActive
+              ? AppColors.heritageAccent
+              : AppColors.navText,
+          overlayColor: const Color.fromRGBO(255, 255, 255, 0.08),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isActive ? AppColors.accent : AppColors.navText,
+            color: isActive ? AppColors.heritageAccent : AppColors.navText,
             fontWeight: FontWeight.w700,
             fontSize: 15,
           ),
@@ -490,6 +505,10 @@ class _NavItem extends StatelessWidget {
     );
   }
 }
+
+// -----------------------------------------------------------------------------
+// ELEMENTOS DEL DRAWER
+// -----------------------------------------------------------------------------
 
 class _DrawerItem extends StatelessWidget {
   final String label;
@@ -504,19 +523,20 @@ class _DrawerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
-      title: Text(
-        label,
-        style: TextStyle(
-          color: isActive ? AppColors.primary : AppColors.textPrimary,
-          fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      child: ListTile(
+        onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+        title: Text(
+          label,
+          style: TextStyle(
+            color: isActive ? AppColors.heritageGreen : AppColors.textPrimary,
+            fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
+          ),
         ),
-      ),
-      tileColor: isActive ? AppColors.backgroundSoft : null,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        tileColor: isActive ? AppColors.heritageBackground : null,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -526,21 +546,16 @@ class _DrawerContactItem extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const _DrawerContactItem({
-    required this.icon,
-    required this.text,
-  });
+  const _DrawerContactItem({required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: AppColors.primary,
-        ),
+        Icon(icon, size: 18, color: AppColors.heritageGreen),
+
         const SizedBox(width: 10),
+
         Expanded(
           child: Text(
             text,

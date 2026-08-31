@@ -13,7 +13,7 @@ class HeroSection extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      constraints: const BoxConstraints(minHeight: 620),
+      height: double.infinity,
       decoration: const BoxDecoration(
         image: DecorationImage(
           image: AssetImage('assets/images/hero_bus.png'),
@@ -87,9 +87,7 @@ class HeroSection extends StatelessWidget {
 class _HeroContent extends StatelessWidget {
   final TextTheme textTheme;
 
-  const _HeroContent({
-    required this.textTheme,
-  });
+  const _HeroContent({required this.textTheme});
 
   @override
   Widget build(BuildContext context) {
@@ -141,16 +139,11 @@ class _HeroContent extends StatelessWidget {
               ),
               OutlinedButton(
                 onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    AppRouter.horarios,
-                  );
+                  Navigator.pushNamed(context, AppRouter.horarios);
                 },
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
-                  side: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.35),
-                  ),
+                  side: BorderSide(color: Colors.white.withValues(alpha: 0.35)),
                   backgroundColor: Colors.white.withValues(alpha: 0.16),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -195,9 +188,9 @@ class _HeroCard extends StatelessWidget {
           Text(
             'Compromiso en cada trayecto',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w700,
-                ),
+              color: AppColors.primary,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 16),
           const _HeroPoint(text: 'Más de 40 años de experiencia'),
@@ -216,9 +209,7 @@ class _HeroCard extends StatelessWidget {
 class _HeroPoint extends StatelessWidget {
   final String text;
 
-  const _HeroPoint({
-    required this.text,
-  });
+  const _HeroPoint({required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -240,9 +231,9 @@ class _HeroPoint extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textPrimary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.textPrimary),
           ),
         ),
       ],
