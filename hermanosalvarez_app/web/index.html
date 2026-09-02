@@ -376,6 +376,48 @@
 
 <script defer src="/_vercel/insights/script.js"></script>
 
+<!-- Flutter SPA route tracking for Vercel Analytics -->
+<script>
+  (() => {
+    let lastTrackedPath = window.location.pathname;
+
+    function trackCurrentPage() {
+      const path = window.location.pathname;
+
+      if (path === lastTrackedPath) {
+        return;
+      }
+
+      lastTrackedPath = path;
+
+      window.va('pageview', {
+        route: path,
+        path: path
+      });
+    }
+
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+
+    history.pushState = function (...args) {
+      originalPushState.apply(this, args);
+
+      setTimeout(trackCurrentPage, 0);
+    };
+
+    history.replaceState = function (...args) {
+      originalReplaceState.apply(this, args);
+
+      setTimeout(trackCurrentPage, 0);
+    };
+
+    window.addEventListener('popstate', () => {
+      setTimeout(trackCurrentPage, 0);
+    });
+  })();
+</script>
+
+
 <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
